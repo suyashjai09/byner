@@ -1,0 +1,47 @@
+@import 'carbon';
+
+body {
+  @include carbon--theme();
+
+}
+
+.app {
+    display: flex;
+    // app should have no horizontal scroll bar, this should be in content area
+    overflow: hidden;
+    max-width: 100%;
+    height: 100vh;
+    flex-direction: column;
+}
+
+  .bx--side-nav__overlay-active  {
+    opacity: 0 !important ; 
+  }
+  
+  .bx--side-nav__items {
+    padding: 0 !important;   
+  }
+
+  .bx--side-nav__item--active .bx--side-nav__submenu[aria-expanded=false] { 
+    background-color: #ffffff !important;  
+}
+
+.bx--content {
+  height: 100vh;
+    background-color: #f4f4f4;
+}
+
+.bx--side-nav__item--active .bx--side-nav__submenu[aria-expanded=false]::before {
+  background-color: #fff !important;
+}
+
+.main--content {
+  display: flex;
+  width: 100%;
+  height: calc(100vh - 3rem);
+  align-items: center;
+  justify-content: center;
+  margin-top: $spacing-09;
+}
+
+
