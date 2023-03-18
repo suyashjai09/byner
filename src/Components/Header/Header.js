@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState ,useContext} from 'react';
+import { ThemeContext } from '../../sdk/theme/ThemeContext';
 import {
   Header,
   HeaderMenuButton,
@@ -14,7 +15,8 @@ import {
   Content,
   Select,
   Modal,
-  SelectItem
+  SelectItem,
+  Dropdown
 } from 'carbon-components-react';
 import HeaderContainer from "carbon-components-react/lib/components/UIShell/HeaderContainer";
 import { Notification20, UserAvatar20, Switcher20,Search20,
@@ -22,17 +24,41 @@ import { Notification20, UserAvatar20, Switcher20,Search20,
 import { Navbar } from '../Navbar/Navbar';
 import { NotificationPanel } from '../NotificationPanel/NotificationPanel';
 import {sampleData} from '../NotificationPanel/NotificationData'; 
+import '../../sdk/theme/Themes.scss'
 import { ProfileDropdown } from '../ProfileDropdown/ProfileDropdown';
 export const CommonHeader = ({ className }) => {
 
+  const theme = useContext(ThemeContext);
   const [open, setOpen] = useState(false);
   const [profileDropdown, setProfileDropdown] = useState(false);
   const [notificationsData, setNotificationsData] = useState(sampleData);
+  const [themeValue,setThemeValue] = useState();
+  const themeData = [
+    {
+      text: 'White',
+      value: 'carbon-theme--white',
+    },
+    {
+      text: 'Gray 90',
+      value: 'carbon-theme--g90',
+    },
+    {
+      text: 'Gray 100',
+      value: 'carbon-theme--g100',
+    },
+  ];
   // const [isSideNavExpanded, setIsSideNavExpanded] = useState(false);
 
   // // const handleClickSideNavExpand = () => {
   // //   setIsSideNavExpanded(!isSideNavExpanded);
   // // };
+
+  const setTheme = (selectedItem) => {
+    console.log(selectedItem, "hello");
+    const bodyElement = document.body;
+    bodyElement.className = selectedItem.value;
+    theme.dispatch({ type: selectedItem });
+  };
 
   const StoryContent = () => {
     const content = (
@@ -303,23 +329,26 @@ export const CommonHeader = ({ className }) => {
      <div className="main--content">
       <NotificationPanel open={open} setOpen={setOpen} setNotificationsData={setNotificationsData} notificationsData={notificationsData}/>
      </div>
-     {/* <div className="main-content">
-      <ProfileDropdown open={profileDropdown} setOpen={setProfileDropdown}/>
-     </div> */} 
      <div>
      <Modal
-        modalHeading="Add a custom domain"
-          modalLabel="Account resources"
          primaryButtonText="Add"
           secondaryButtonText="Cancel"
           open={profileDropdown}
           onRequestClose={() => setProfileDropdown(false)}>
-          
-         <Select id="select-1" defaultValue="us-south" labelText="Region">
-            <SelectItem value="us-south" text="US South" />
-            <SelectItem value="us-east" text="US East" />
-          </Select>
-        </Modal>
+           <div className="carbon-theme-dropdown">
+          <Dropdown
+        direction="down"
+        ariaLabel="Theme dropdown"
+        id="theme-dropdown"
+        items={themeData}
+        itemToString={(item) => (item ? item.text : "")}
+        onChange={(event) => setTheme(event.selectedItem)}
+        selectedItem={theme.state.currentTheme}
+        label="Select a Carbon theme"
+        titleText="Select a Carbon theme"
+       />
+      </div>
+       </Modal>
         </div>
     </div>
   );

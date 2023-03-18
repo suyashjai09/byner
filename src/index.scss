@@ -43,5 +43,15 @@ body {
   justify-content: center;
   margin-top: $spacing-09;
 }
+// .carbon-theme-dropdown {
+//   height:60px;
+//   border:1px solid red;
+// }
 
+.carbon-theme-dropdown .#{$prefix}--label {
+  @include carbon--type-style('label-01');
+}
 
+.bx--modal-content {
+  height: 30vh;
+}
