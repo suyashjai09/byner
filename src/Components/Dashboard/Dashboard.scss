@@ -1,0 +1,36 @@
+.bynar-dashboard {
+  height: 100vh;
+  border: 1px solid blue;
+  padding-left: 3rem;
+  padding-top: 3rem;
+}
+
+@media screen and (min-width: 320px){
+.pal--page-header {
+    padding-left: 0.75rem!important;
+    padding-right: 1.75rem!important;
+}
+}
+
+@media screen and (min-width: 0){
+.pal--page-header {
+    padding-left: 0!important;
+    padding-right: 0!important;
+}
+}
+@media screen and (min-width: 42rem){
+  .pal--page-header {
+    padding: var(--cds-spacing-05,1rem) var(--cds-spacing-07,2rem) var(--cds-spacing-07,2rem);
+}
+}
+
+.pal--page-header {
+    background-color: var(--cds-ui-background,#fff);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: var(--cds-spacing-05,1rem) var(--cds-spacing-05,1rem) var(--cds-spacing-07,2rem);
+    width: 100%;
+}
+  
+  

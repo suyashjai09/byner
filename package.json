@@ -6,6 +6,7 @@
     "@carbon/elements": "^10",
     "@carbon/ibm-products": "^1",
     "@carbon/icons-react": "^10",
+    "@carbon/react": "^1.25.0",
     "carbon-components": "^10",
     "carbon-components-react": "^7",
     "carbon-icons": "latest",
