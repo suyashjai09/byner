@@ -10,7 +10,9 @@ import { Notification20, UserAvatar20, Switcher20,Search20,
 import { ThemeModel } from '../../sdk/theme/ThemeModel';
 
 
-export const ProfileDropdown=({open,setOpen,openModel,setModelOpen})=>{
+export const ProfileDropdown=({open,setOpen})=>{
+  
+    const [openModel,setModelOpen] = useState(false);
     const wrapperRef = useRef(null);
     const showProfilePanelRef = useRef(null);
     const setShowProfilePanelRef = useRef(null);

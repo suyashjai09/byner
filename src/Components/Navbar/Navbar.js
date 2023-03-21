@@ -1,17 +1,17 @@
 import React from "react";
 import { render } from "react-dom";
 import {
-  Content,
   SideNav,
   SideNavItems,
   SideNavLink,
   SideNavMenu,
   SideNavMenuItem
 } from 'carbon-components-react';
+import { useNavigate } from "react-router-dom";
 import { Notification20, UserAvatar20, Switcher20,Search20,
   AppSwitcher20 } from '@carbon/icons-react';
 export const Navbar = ({isSideNavExpanded,onClickSideNavExpand}) => {
-
+  let navigate = useNavigate();
   const Fade16 = () => (
     <svg
       width="16"
@@ -29,67 +29,13 @@ export const Navbar = ({isSideNavExpanded,onClickSideNavExpand}) => {
          <SideNav aria-label="Side navigation" 
             isRail 
             expanded={isSideNavExpanded} 
-            // //  onOverlayClick={onClickSideNavExpand} 
-            // //  isActive={isSideNavExpanded}
-
             >
               <SideNavItems>
-                <SideNavMenu renderIcon={Search20} title="Category title">
-                  <SideNavMenuItem
-                    aria-current="page"
-                    href="javascript:void(0)"
-                  >
-                    Link
-                  </SideNavMenuItem>
-                  <SideNavMenuItem href="javascript:void(0)">
-                    Link
-                  </SideNavMenuItem>
-                </SideNavMenu>
-                 <SideNavMenu renderIcon={Fade16} title="Category title">
-                  <SideNavMenuItem
-                    aria-current="page"
-                    href="javascript:void(0)"
-                  >
-                    Link
-                  </SideNavMenuItem>
-                  <SideNavMenuItem href="javascript:void(0)">
-                    Link
-                  </SideNavMenuItem>
-                </SideNavMenu>
-                <SideNavMenu renderIcon={Fade16} title="Category title">
-                  <SideNavMenuItem
-                    aria-current="page"
-                    href="javascript:void(0)"
-                  >
-                    Link
-                  </SideNavMenuItem>
-                  <SideNavMenuItem href="javascript:void(0)">
-                    Link
-                  </SideNavMenuItem>
-                </SideNavMenu>
-                <SideNavMenu renderIcon={Fade16} title="Category title">
-                  <SideNavMenuItem
-                    aria-current="page"
-                    href="javascript:void(0)"
-                  >
-                    Link
-                  </SideNavMenuItem>
-                  <SideNavMenuItem href="javascript:void(0)">
-                    Link
-                  </SideNavMenuItem>
-                </SideNavMenu>
-                <SideNavMenu renderIcon={Fade16} title="Category title">
-                  <SideNavMenuItem
-                    aria-current="page"
-                    href="javascript:void(0)"
-                  >
-                    Link
-                  </SideNavMenuItem>
-                  <SideNavMenuItem href="javascript:void(0)">
-                    Link
-                  </SideNavMenuItem>
-                </SideNavMenu>
-                 <SideNavMenu renderIcon={Fade16} title="Category title">
+                <SideNavLink renderIcon={Search20} title="Data Table" onClick={()=>{navigate("/datatable")}}>Data Table</SideNavLink>
+                <SideNavLink renderIcon={Fade16} title="Side Panel" onClick={()=>{navigate("/sidepanel")}}>Side Panel</SideNavLink> 
+                <SideNavLink renderIcon={Fade16} title="Tear Sheet" onClick={()=>{navigate("/tearsheet")}}>TearSheet</SideNavLink>
+                 
+                {/* <SideNavMenu renderIcon={Fade16} title="Category title">
                   <SideNavMenuItem
                     aria-current="page"
                     href="javascript:void(0)"
@@ -132,84 +78,7 @@ export const Navbar = ({isSideNavExpanded,onClickSideNavExpand}) => {
                   <SideNavMenuItem href="javascript:void(0)">
                     Link
                   </SideNavMenuItem>
-                </SideNavMenu>
-                 <SideNavMenu renderIcon={Fade16} title="Category title">
-                  <SideNavMenuItem
-                    aria-current="page"
-                    href="javascript:void(0)"
-                  >
-                    Link
-                  </SideNavMenuItem>
-                  <SideNavMenuItem href="javascript:void(0)">
-                    Link
-                  </SideNavMenuItem>
-                </SideNavMenu>
-                <SideNavMenu renderIcon={Fade16} title="Category title">
-                  <SideNavMenuItem
-                    aria-current="page"
-                    href="javascript:void(0)"
-                  >
-                    Link
-                  </SideNavMenuItem>
-                  <SideNavMenuItem href="javascript:void(0)">
-                    Link
-                  </SideNavMenuItem>
-                </SideNavMenu>
-                <SideNavMenu renderIcon={Fade16} title="Category title">
-                  <SideNavMenuItem
-                    aria-current="page"
-                    href="javascript:void(0)"
-                  >
-                    Link
-                  </SideNavMenuItem>
-                  <SideNavMenuItem href="javascript:void(0)">
-                    Link
-                  </SideNavMenuItem>
-                </SideNavMenu>
-                <SideNavMenu renderIcon={Fade16} title="Category title">
-                  <SideNavMenuItem
-                    aria-current="page"
-                    href="javascript:void(0)"
-                  >
-                    Link
-                  </SideNavMenuItem>
-                  <SideNavMenuItem href="javascript:void(0)">
-                    Link
-                  </SideNavMenuItem>
-                </SideNavMenu>
-                 <SideNavMenu renderIcon={Fade16} title="Category title">
-                  <SideNavMenuItem
-                    aria-current="page"
-                    href="javascript:void(0)"
-                  >
-                    Link
-                  </SideNavMenuItem>
-                  <SideNavMenuItem href="javascript:void(0)">
-                    Link
-                  </SideNavMenuItem>
-                </SideNavMenu>
-                <SideNavMenu renderIcon={Fade16} title="Category title">
-                  <SideNavMenuItem
-                    aria-current="page"
-                    href="javascript:void(0)"
-                  >
-                    Link
-                  </SideNavMenuItem>
-                  <SideNavMenuItem href="javascript:void(0)">
-                    Link
-                  </SideNavMenuItem>
-                </SideNavMenu>
-                <SideNavMenu renderIcon={Fade16} title="Category title">
-                  <SideNavMenuItem
-                    aria-current="page"
-                    href="javascript:void(0)"
-                  >
-                    Link
-                  </SideNavMenuItem>
-                  <SideNavMenuItem href="javascript:void(0)">
-                    Link
-                  </SideNavMenuItem>
-                </SideNavMenu>
+                </SideNavMenu> */}
               </SideNavItems>
             </SideNav>
         </div>

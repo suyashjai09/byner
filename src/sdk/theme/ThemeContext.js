@@ -1,4 +1,4 @@
-import React, { createContext, useReducer } from 'react';
+import React, { createContext, useEffect, useReducer } from 'react';
 
 
 
@@ -33,6 +33,9 @@ const themeReducer = (state, action) => {
 export const ThemeProvider=(props)=> {
   const [state, dispatch] = useReducer(themeReducer, initialState);
 
+  useEffect(() => {
+    dispatch({type: themeData[0]})
+  }, [])
   return (
     <ThemeContext.Provider value={{ state, dispatch }}>
       {
