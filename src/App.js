@@ -6,6 +6,7 @@ import Dashboard from './Components/Dashboard/Dashboard';
 import { TearSheets } from './Components/TearSheet/TearSheets';
 import { SidePanels } from './Components/SidePanel/SidePanels';
 import Signup from './pages/signup/signup';
+import Signin from './pages/signin/signin';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
             <Route exact path="/tearsheet" element={<TearSheets />} /> 
 
           </Route>
+          <Route exact path="/signin" element={<Signin />} /> 
         </Routes>
       </BrowserRouter>
     </div>

@@ -153,4 +153,20 @@ a.bx--side-nav__link[aria-current=page]::before, a.bx--side-nav__link--current::
   top: 15%;
 }
 
-
+.react-tel-input .form-control {
+  position: relative;
+  font-size: 14px;
+  letter-spacing: .01rem;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-left: 48px;
+  margin-left: 0;
+  background: #FFFFFF;
+  border: 1px solid #CACACA;
+  border-radius: 5px;
+  line-height: 25px;
+  height: 35px;
+  width: 300px;
+  outline: none;
+  height: 38px !important;
+}
