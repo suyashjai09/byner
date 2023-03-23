@@ -7,23 +7,30 @@ import { TearSheets } from './Components/TearSheet/TearSheets';
 import { SidePanels } from './Components/SidePanel/SidePanels';
 import Signup from './pages/signup/signup';
 import Signin from './pages/signin/signin';
+import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
+import { AuthProvider } from './sdk/context/AuthContext';
 
 function App() {
   return (
     <div className="app">
+      
       <BrowserRouter>
+      <AuthProvider>
         <Routes>
         <Route exact path="/signup" element={<Signup />} /> 
           <Route path='/' element={<CommonHeader />}>
-            <Route exact path="/" element={<Dashboard />} />    {/*A nested route!*/}
+            <Route exact path="/dashboard" element={<Dashboard />} />    {/*A nested route!*/}
             <Route exact path="/datatable" element={<DataTables />} />
-            <Route exact path="/sidepanel" element={<SidePanels />} />
-            <Route exact path="/tearsheet" element={<TearSheets />} /> 
+            {/* <Route exact path="/sidepanel" element={<SidePanels />} />
+            <Route exact path="/tearsheet" element={<TearSheets />} />  */}
 
           </Route>
           <Route exact path="/signin" element={<Signin />} /> 
+          <Route exact path="/forgotpassword" element={<ForgotPassword />} /> 
         </Routes>
+        </AuthProvider>
       </BrowserRouter>
+      
     </div>
   );
 }

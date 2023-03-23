@@ -1,4 +1,4 @@
-.signin-container {
+.multifactor-container {
     height: 100vh;
     display: flex;
     align-items: center;
@@ -27,8 +27,6 @@
             flex-direction: column;
             justify-content: space-between;
 
-           
-
             .checkbox-item{
                 margin: 40px 0px 0px;
                 margin: 40px 0px 0px;
@@ -51,6 +49,7 @@
                 margin-top: 32px;
                 margin-top: 32px;
                 margin-bottom: 16px;
+                color: #ffffff;
             }
 
             input {
@@ -82,46 +81,3 @@
         }
     }
 }
-
-.error-notification-box{
-    display: flex;
-    border-left: 3px solid var(--cds-support-error-inverse, #fa4d56);
-    background: #ffffff;
-    width: 100%;
-    height: 48px;
-    margin-top: 12px;
-    color: #000;
-  
-    .cds--inline-notification__details{
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: stretch;
-      gap:12px;
-    }
-    button{
-      background: transparent;
-      border: 0;
-      color: #000;
-      cursor: pointer;
-      svg{
-        fill: #000;
-      }
-    }
-    svg{
-      fill: #fa4d56;
-    }
-  }
-  
-  .error-notification-box-inactive{
-    width: 400px;
-    height: 32px;
-  }
-  .loader-signin{
-    display: flex;
-    align-items: center;
-    width: 100%;
-    justify-content: center;
-    width: 250px;
-    height: 64px;
-  }

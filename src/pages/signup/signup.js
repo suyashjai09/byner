@@ -1,4 +1,4 @@
-import React, { useState, useRef, useContext } from 'react';
+import React, { useState, useRef, useContext, useEffect } from 'react';
 import 'react-telephone-input/css/default.css'
 import {
     formatCreditCardNumber,
@@ -8,33 +8,14 @@ import {
 } from "../../../src/utils/util.js";
 // import "react-credit-cards/es/styles-compiled.css";
 import {
-    Theme,
-    Content,
-    Form,
-    FormGroup,
-    Stack,
     TextInput,
-    Button,
     Heading,
-    InlineLoading,
     Link,
     InlineNotification,
-    Grid,
-    Column,
-    Row,
-    ProgressIndicator,
-    ProgressStep,
     Select,
     SelectItem,
-    RadioButtonGroup,
-    RadioButton,
-    FlexGrid,
-    HeaderName,
 } from '@carbon/react';
-import {
-    Accordion,
-    div,
-    NotificationActionButton, PasswordInput, Checkbox
+import { PasswordInput
 } from 'carbon-components-react';
 
 import { ArrowRight, ArrowLeft } from '@carbon/react/icons';
@@ -48,11 +29,14 @@ import { PasswordStrength } from '../../Components/PasswordStrength/PasswordStre
 import countrylist from '../../data/countrylist';
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
+import { Loader } from '../../Components/Loader/Loader.js';
 
 
 const Signup = () => {
 
     // var ReactTelInput = require('react-telephone-input');
+    const [errorNotification, setErrorNotification] = useState({title: "Enter Valid Verification code.Try again"});
+   
     const [loading, setLoading] = useState(false);
     const [loadingSuccess, setLoadingSuccess] = useState(false);
     const [password, setPassword] = useState('');
@@ -62,7 +46,7 @@ const Signup = () => {
     const [passwordStrengthWidth, setpaswordStrengthWidth] = useState(0);
     const [passwordIsValid, setPasswordIsValid] = useState(true);
     const [emailIsValid, setEmailValid] = useState(true);
-    const [activeStep, setActiveStep] = useState(1);
+    const [activeStep, setActiveStep] = useState(2);
     const [verificationCode, setVerificationCode] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -78,15 +62,20 @@ const Signup = () => {
     const [isTaxInfoUpdated, setIsTaxInfoUpdated] = useState(false);
     const [vatNumber, setVatNumber] = useState('');
     const [organizationName, setOrganizationName] = useState('');
-    const [country_name, setCountryName] = useState("India");
+    const [organizationCountry, setCountryName] = useState("India");
     const [isGstValid, setGstValid] = useState(false);
     const [cardNumber, setCardNumber] = useState('');
     const [cardExpiryDate, setCardExpiryDate] = useState('');
     const [cardCVV, setCardCVV] = useState('');
     const [isChecked, setIsChecked] = useState(false);
-    const [isCardInfoUpdated,setCardInfoUpdated] = useState(false);
+    const [isCardInfoUpdated, setCardInfoUpdated] = useState(false);
+    const [isError, setIsError] = useState(false);
+    const [isAccountInfoError, setIsAccountInfoError] = useState(false);
+    const [isVerifyEmailInfoError, setIsVerifyEmailError] = useState(false);
+    const [isCreateAccountError, setIsCreateAccountError] = useState(false);
+    const [userId, setUserId] = useState('');
+    console.log(isError, "check")
     const personalInfoButtonDisabled = firstName.length == 0 || lastName.length == 0 || city.length == 0 || state.length == 0 || postalCode.length == 0 || phoneNumber.length == 0 || addressLine1.length == 0;
-    // console.log(a,"tesr");
     const handleFirstNameChange = (value) => {
         setFirstName(value);
     }
@@ -94,28 +83,41 @@ const Signup = () => {
         setLastName(value);
     }
     const handleVerificationCodeChange = (value) => {
+        setErrorNotification({});
         setVerificationCode(value);
+        setIsError(false)
+        setIsVerifyEmailError(false);
     }
 
-    const checkEmailValid=(value)=>{
+    const checkEmailValid = (value) => {
         var isEmailValid =
-			/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
-		if (value || value.length !== 0) {
-			if (isEmailValid.test(value)) {
-				return true
-			} else {
-				return false
-			}
-		} else {
-			return false
-		}
+            /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+        if (value || value.length !== 0) {
+            if (isEmailValid.test(value)) {
+                return true
+            } else {
+                return false
+            }
+        } else {
+            return false
+        }
     }
 
     const handleEmailChange = (value) => {
-        setEmailAddress(value);  
+
+        setErrorNotification({});
+        setIsError(false);
+        setIsAccountInfoError(false);
+
+        setEmailAddress(value);
         setEmailValid(checkEmailValid(value));
     };
     const handlePasswordChange = (value) => {
+
+        setErrorNotification({});
+        setIsError(false)
+        setIsAccountInfoError(false);
+
         setPassword(value);
         const lengthRegex = /^.{8,}$/;
         const uppercaseRegex = /[A-Z]/;
@@ -129,6 +131,7 @@ const Signup = () => {
     };
 
     const handleSignupRequest = () => {
+
         const fetchData = async () => {
             setLoading(true);
             setLoadingSuccess(true);
@@ -136,7 +139,7 @@ const Signup = () => {
                 email: email,
                 password: password,
             }
-            
+
             // const response = await fetch(`https://w5i6csz6w9.execute-api.eu-central-1.amazonaws.com/Stage/signup`, {
             //     method: 'POST',
             //     body: JSON.stringify(data),
@@ -144,24 +147,37 @@ const Signup = () => {
             //         'Content-Type': 'application/json',
             //     },
             // })
-            
+
+            // setTimeout(() => {
+            //     // setLoadingSuccess(false);
+            //     //  setLoading(false);
+            //     // setActiveStep(2);
+            //   }, 8000);
+            // //   setTimeout(() => {
+            // //        setSuccess(false);
+            // //           setDescription('Submitting...');
+            // //               setAriaLive('off');
+            // // }, 1500);
+            // if(true){
+            //     setErrorNotification({
+            //         title: "Email or password error.Try again"
+            //     });
+            //     setIsError(true)
+            //     setIsAccountInfoError(true);
+            //     setActiveStep(1);
+
+            // }
+            // else {
+            //     setActiveStep(1);
+            //     setIsAccountInfoUpdated(true);
+            // }
             setTimeout(() => {
-                // setLoadingSuccess(false);
-                //  setLoading(false);
-                // setActiveStep(2);
-              }, 8000);
-            //   setTimeout(() => {
-            //        setSuccess(false);
-            //           setDescription('Submitting...');
-            //               setAriaLive('off');
-            // }, 1500);
-              
-           
-             
-           
+                setLoading(false);
+                setActiveStep(2)
+            }, 2000);
+
+
         }
-        // setIsAccountInfoUpdated(true)
-        // setActiveStep(2);
         fetchData();
     }
 
@@ -170,12 +186,67 @@ const Signup = () => {
     }
 
     const handleVerifyEmail = () => {
+        setLoading(true);
         const fetchData = async () => {
             const data = {
                 email: email,
                 code: verificationCode,
             }
-            const response = await fetch(`https://w5i6csz6w9.execute-api.eu-central-1.amazonaws.com/Stage/confirm-email`, {
+            // const response = await fetch(`https://w5i6csz6w9.execute-api.eu-central-1.amazonaws.com/Stage/confirm-email`, {
+            //     method: 'POST',
+            //     body: JSON.stringify(data),
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //     },
+            // })
+
+            
+
+            if(true){
+                setTimeout(() => {
+                    setLoading(false);
+                    
+                    setErrorNotification({
+                        title: "Enter Valid Verification code.Try again"
+                    });
+                    setIsError(true)
+                    setIsVerifyEmailError(true);
+                    setActiveStep(2);
+                }, 2000);
+                
+
+            }
+            else {
+                setActiveStep(1);
+                setIsAccountInfoUpdated(true);
+            }
+            // setActiveStep(3);
+            // return response
+        }
+        // setActiveStep(3);
+        fetchData();
+    }
+
+    const handleCreateAccount = () => {
+
+        const fetchData = async () => {
+            const data = {
+                id: userId,
+                username: email,
+                fullName: firstName + " " + lastName,
+                country: country,
+                addressLine: addressLine1,
+                addressLine2: addressLine2,
+                city: city,
+                postalCode: postalCode,
+                state: state,
+                phoneNumber: phoneNumber,
+                organizationName: organizationName,
+                VAT: vatNumber,
+                organisationCountry: organizationCountry,
+                isAgreementSigned: isChecked,
+            }
+            const response = await fetch(`https://w5i6csz6w9.execute-api.eu-central-1.amazonaws.com/Stage/create-user`, {
                 method: 'POST',
                 body: JSON.stringify(data),
                 headers: {
@@ -183,13 +254,23 @@ const Signup = () => {
                 },
             })
 
+            // if(true){
+            //     setErrorNotification({
+            //         title: "Enter Valid Verification code.Try again"
+            //     });
+            //     setIsError(true)
+            //     setIsVerifyEmailError(true);
+            //     setActiveStep(1);
+
+            // }
+            // else {
+            //     setActiveStep(1);
+            //     setIsAccountInfoUpdated(true);
+            // }
             // setActiveStep(3);
             return response
         }
-        setActiveStep(3);
-        // fetchData();
     }
-
     const handlePersonalInfo = () => {
 
         setIsProfileInfoUpdated(true);
@@ -206,30 +287,55 @@ const Signup = () => {
         setIsTaxInfoUpdated(true);
         setActiveStep(5);
     }
-    const  handleCardInfo=()=>{
+    const handleCardInfo = () => {
         setCardInfoUpdated(true);
         setActiveStep(6);
     }
-    const handleInputChange=({target})=>{
+    const handleInputChange = ({ target }) => {
         if (target.name === "number") {
             target.value = formatCreditCardNumber(target.value);
             setCardNumber(target.value);
-          } else if (target.name === "expiry") {
+        } else if (target.name === "expiry") {
             target.value = formatExpirationDate(target.value);
             setCardExpiryDate(target.value);
-          } else if (target.name === "cvc") {
+        } else if (target.name === "cvc") {
             target.value = formatCVC(target.value);
             setCardCVV(target.value)
-          }
+        }
     }
 
-    const creditCardButtonDisabled = cardCVV.length==0 || cardExpiryDate.length==0 || cardNumber.length==0;
-    const taxInfoButtonDisabled = organizationName.length == 0 || country_name.length == 0 || (!isGstValid && vatNumber.length > 0);
+    const creditCardButtonDisabled = cardCVV.length == 0 || cardExpiryDate.length == 0 || cardNumber.length == 0;
+    const taxInfoButtonDisabled = organizationName.length == 0 || organizationCountry.length == 0 || (!isGstValid && vatNumber.length > 0);
 
-    console.log(taxInfoButtonDisabled, isAccountInfoUpdated, isProfileInfoUpdated, isTaxInfoUpdated, isChecked)
+    useEffect(() => {
+        // 👇️ scroll to top on page load
+        console.log(errorNotification, 'check', isError)
+        if (isError) {
+            document.getElementById("scroller").scroll(0, 0);
+        }
+    }, [isError]);
+    // console.log(taxInfoButtonDisabled, isAccountInfoUpdated, isProfileInfoUpdated, isTaxInfoUpdated, isChecked)
     return (
 
-        <div style={{ overflow: 'auto' }}>
+        <div id="scroller" style={{ overflow: 'auto', backgroundColor: '#000' }}>
+            <div className='header-box'>
+                <div className="login-link" style={{ 'marginBottom': '1.5rem' }}>Already have an account? <Link href="/signin">Log in</Link></div>
+                <Heading>Sign Up</Heading>
+                {typeof errorNotification == 'object' && Object.keys(errorNotification).length !== 0 ?
+                    (
+                        <InlineNotification
+                            className="error-notification"
+                            onClose={function noRefCheck() { }}
+                            onCloseButtonClick={() => { setErrorNotification({}); setIsError(false) }}
+                            statusIconDescription="notification"
+                            // subtitle={errorNotification.subtitle ? errorNotification.subtitle : ''}
+                            title={errorNotification.title ? errorNotification.title : ''}
+                        />) : (
+                        <div className="error-notification-inactive"></div>
+                    )
+                }
+            </div>
+
             <div className="accordian">
                 {activeStep == 1 ? (
                     <div className='account'>
@@ -241,9 +347,9 @@ const Signup = () => {
                             labelText="Email"
                             value={email}
                             onChange={(e) => handleEmailChange(e.target.value)}
-                            invalid={!emailIsValid && email.length>0}
+                            invalid={!emailIsValid && email.length > 0}
                             invalidText={
-                                !emailIsValid && email.length>0
+                                !emailIsValid && email.length > 0
                                     ? 'Enter valid email address' : null
                             }
                         />
@@ -255,36 +361,31 @@ const Signup = () => {
                             onFocus={() => { setIsPasswordVisible(true) }}
                             onBlur={() => { setIsPasswordVisible(false) }}
 
-                            invalid={!passwordIsValid && password.length>0}
+                            invalid={!passwordIsValid && password.length > 0}
                             invalidText={
-                                !passwordIsValid && password.length>0
+                                !passwordIsValid && password.length > 0
                                     ? 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number.'
                                     : null
                             }
                         />
                         {isPasswordVisible && <div style={{ width: `${passwordStrengthWidth}px`, height: '4px', backgroundColor: 'green', marginTop: '2px' }}></div>}
                         {isPasswordVisible && <PasswordStrength passwordArray={passwordArray} />}
-                        <div style={{ marginTop: '32px' }}>
-                            <button disabled={!passwordIsValid || !emailIsValid || email.length == 0 || password.length == 0}
-                                className={!passwordIsValid || !emailIsValid || email.length == 0 || password.length == 0 ? 'submit-button-disabled' : 'submit-button'} onClick={() => handleSignupRequest()}>
-                                {!isAccountInfoUpdated ? "Next" : "Update"}
-                            </button>
-                        </div>
-                        {/* {loading ? 
-                                (
-                                    <div class="loader">tesyy</div>
-                                  ) : 
-                                  (
-                                    <Button
-                                    renderIcon={ArrowRight} 
-                                    type="submit"
-                                    iconDescription="Next"
-                                    disabled={!passwordIsValid && !emailIsValid && email.length == 0 && password.length == 0}
-                                className={!passwordIsValid && !emailIsValid && email.length == 0 && password.length == 0 ? 'submit-button-disabled' : 'submit-button'} onClick={() => handleSignupRequest()}>
-                               
-                               {!isAccountInfoUpdated ? "Next" : "Update"}</Button>
-                                    )
-                                  } */}
+
+                        {loading ?
+                            (
+                                <div style={{ marginTop: '32px' }}>
+                                    <Loader />
+                                </div>
+                            ) :
+                            (
+                                <div style={{ marginTop: '32px' }}>
+                                    <button disabled={!passwordIsValid || !emailIsValid || email.length == 0 || password.length == 0 || isAccountInfoError}
+                                        className={!passwordIsValid || !emailIsValid || email.length == 0 || password.length == 0 || isAccountInfoError ? 'submit-button-disabled' : 'submit-button'} onClick={() => handleSignupRequest()}>
+                                        {!isAccountInfoUpdated ? "Next" : "Update"}
+                                    </button>
+                                </div>
+                            )
+                        }
                     </div>) :
                     (<div className='account-edit'>
                         <div className='account-header-edit'>
@@ -311,12 +412,23 @@ const Signup = () => {
                         //         ? 'Enter valid email address' : null
                         // }
                         />
-                        <div>
-                            <button disabled={verificationCode.length == 0}
-                                className={verificationCode.length == 0 ? 'submit-button-disabled' : 'submit-button'} onClick={() => handleVerifyEmail()}>
-                                Submit
-                            </button>
-                        </div>
+                        {loading ?
+                            (
+                                <div style={{ marginTop: '8px' }}>
+                                    <Loader />
+                                </div>
+                            ) :
+                            (
+                                <div className='verify-button-class'>
+                                    <button disabled={verificationCode.length == 0 && isVerifyEmailInfoError}
+                                        className={verificationCode.length == 0 && isVerifyEmailInfoError ? 'submit-button-disabled' : 'submit-button'} onClick={() => handleVerifyEmail()}>
+                                        Submit
+                                    </button>
+                                    <button
+                                        className={'resend-button'} onClick={() => handleSignupRequest()}>
+                                        Resend
+                                    </button>
+                                </div>)}
                     </div>) :
                     (<div id="verify-section" class="email-verification">
                         <p>Verify Email</p>
@@ -429,9 +541,9 @@ const Signup = () => {
                             }
                         />
                         <Select className='country-select'
-                            value={country_name}
+                            value={organizationCountry}
                             id='country-ci'
-                            labelText='Country or region of residence*'
+                            labelText='organisation Country'
                             onChange={e => setCountryName(e.target.value)}
                         >
                             {countrylist.map((countryObject, countryIndex) => (<SelectItem
@@ -478,36 +590,36 @@ const Signup = () => {
                                 value={cardNumber}
                                 required
                                 onChange={handleInputChange}
-                           
+
                             />
                         </div>
                         <div className="form-group">
-                            
-                                <input
-                                    type="tel"
-                                    name="expiry"
-                                    className="form-control"
-                                    placeholder="Valid Thru"
-                                    pattern="\d\d/\d\d"
-                                    value={cardExpiryDate}
-                                    required
-                                    onChange={handleInputChange}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <input
-                                    type="tel"
-                                    name="cvc"
-                                    className="form-control"
-                                    placeholder="CVC"
-                                    pattern="\d{3,4}"
-                                    value={cardCVV}
-                                    required
-                                    onChange={handleInputChange}
-                                />
-                            </div>
-                        
-                    
+
+                            <input
+                                type="tel"
+                                name="expiry"
+                                className="form-control"
+                                placeholder="Valid Thru"
+                                pattern="\d\d/\d\d"
+                                value={cardExpiryDate}
+                                required
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <input
+                                type="tel"
+                                name="cvc"
+                                className="form-control"
+                                placeholder="CVC"
+                                pattern="\d{3,4}"
+                                value={cardCVV}
+                                required
+                                onChange={handleInputChange}
+                            />
+                        </div>
+
+
                         <div >
                             <button disabled={creditCardButtonDisabled}
                                 className={creditCardButtonDisabled ? 'submit-button-disabled' : 'submit-button'} onClick={() => handleCardInfo()}>
@@ -534,7 +646,7 @@ const Signup = () => {
                         <div className='account-header'>
                             <p className='text-heading'>Account notice</p>
                         </div>
-                        <p>IBM may use my contact data to keep me informed of products, services and offerings:</p>
+                        <p>Organisation may use my contact data to keep me informed of products, services and offerings:</p>
                         <p>You can withdraw your marketing consent at any time by submitting an opt-out request. Also you may unsubscribe from receiving marketing emails by clicking the unsubscribe link in each email.</p>
                         <div style={{ display: 'flex', alignItems: 'center' }}>
                             <input type="checkbox" id="vehicle1" className='checkbox' name="vehicle1" value="Bike" onChange={(e) => { setIsChecked(e.target.checked) }} />
@@ -551,7 +663,7 @@ const Signup = () => {
                     )}
                 <div >
                     <button disabled={taxInfoButtonDisabled || isAccountInfoUpdated || isProfileInfoUpdated || isTaxInfoUpdated || isChecked}
-                        className={taxInfoButtonDisabled || isAccountInfoUpdated || isProfileInfoUpdated || isTaxInfoUpdated || isChecked ? 'submit-button-disabled' : 'submit-button'} onClick={() => handleTaxInfo()}>
+                        className={taxInfoButtonDisabled || isAccountInfoUpdated || isProfileInfoUpdated || isTaxInfoUpdated || isChecked ? 'submit-button-disabled' : 'submit-button'} onClick={() => handleCreateAccount()}>
                         Create Account
                     </button>
                 </div>

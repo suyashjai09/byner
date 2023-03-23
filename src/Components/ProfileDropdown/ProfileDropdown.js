@@ -1,5 +1,5 @@
 import { Popover, PopoverContent } from '@carbon/react';
-import React, { useState ,useEffect,useRef} from 'react';
+import React, { useState ,useEffect,useRef,useContext} from 'react';
 import { Notification20, UserAvatar20, Switcher20,Search20,
   AppSwitcher20,User} from '@carbon/icons-react';
   import {
@@ -8,16 +8,23 @@ import { Notification20, UserAvatar20, Switcher20,Search20,
     Tile,
   } from '@carbon/react';
 import { ThemeModel } from '../../sdk/theme/ThemeModel';
+import { AuthContext } from '../../sdk/context/AuthContext';
 
 
 export const ProfileDropdown=({open,setOpen})=>{
   
+    const authContext = useContext(AuthContext)
     const [openModel,setModelOpen] = useState(false);
     const wrapperRef = useRef(null);
     const showProfilePanelRef = useRef(null);
     const setShowProfilePanelRef = useRef(null);
     showProfilePanelRef.current = open;
     setShowProfilePanelRef.current = setOpen;
+
+    const handleLogout=async(e)=>{
+    e.preventDefault();
+    const logout = await authContext.signout();
+    }
     useEffect(() => {
       const handleClickOutside = (event) => {
         if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
@@ -55,7 +62,7 @@ export const ProfileDropdown=({open,setOpen})=>{
                     <li className='bynar-profile-settings-item' ><Link>Profile</Link></li>
                     <li className='bynar-profile-settings-item' ><Link>Privacy</Link></li>
                     <li className='bynar-profile-settings-item' ><Link style={{ 'cursor': 'pointer' }} onClick={() => setModelOpen(!openModel)} >Change Theme</Link></li>
-                    <li className='bynar-profile-settings-item' ><Link>Logout</Link></li>
+                    <li className='bynar-profile-settings-item' ><Link onClick={handleLogout}>Logout</Link></li>
                   </ul>
                 </Tile>
               ) : ('')}
