@@ -23,7 +23,6 @@ function App() {
             <Route exact path="/datatable" element={<DataTables />} />
             {/* <Route exact path="/sidepanel" element={<SidePanels />} />
             <Route exact path="/tearsheet" element={<TearSheets />} />  */}
-
           </Route>
           <Route exact path="/signin" element={<Signin />} /> 
           <Route exact path="/forgotpassword" element={<ForgotPassword />} /> 

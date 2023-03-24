@@ -9,10 +9,16 @@
 :root {
   @include themes.theme($white);
   --cds-ui-background: #f4f4f4;
+  --cds-ui-navbar:#fff;
 }
 
 .carbon-theme--white{
   --cds-ui-background: #f4f4f4;
+  --cds-layer-accent:#8d8d8d;
+  --cds-layer:#fff;
+}
+.carbon-theme--g90{
+  --cds-ui-navbar: #262626;
 }
 
 body {
@@ -45,7 +51,7 @@ body {
   }
 
   .bx--side-nav__navigation { 
-    background-color: var(--cds-ui-background, #f4f4f4) !important;  
+    background-color: var(--cds-ui-navbar, #f4f4f4) !important;  
     border-right: 1px solid var(--cds-ui-03, #e0e0e0);
     width: 189px;
 }
@@ -54,7 +60,6 @@ body {
   height: 100vh;
   background-color: var(--cds-ui-background, #f4f4f4);
 }
-
 .bx--side-nav__item--active .bx--side-nav__submenu[aria-expanded=false]::before {
   background-color: var(--cds-ui-background, #f4f4f4) !important;
 }
@@ -78,12 +83,14 @@ a.bx--side-nav__link[aria-current=page]::before, a.bx--side-nav__link--current::
   bottom: 0;
   left: 0;
   width: 4px;
-  background-color: var(--cds-ui-background, #f4f4f4) !important;
+  background-color: var(--cds-ui-navbar, #f4f4f4) !important;
   content: "";
 }
- .bx--side-nav--expanded {
-  width: 12rem;
-}
+//  .bx--side-nav--expanded {
+//   width: 12rem;
+// }
+
+
 .main--content {
   display: flex;
   width: 100%;
@@ -96,7 +103,15 @@ a.bx--side-nav__link[aria-current=page]::before, a.bx--side-nav__link--current::
 //   height:60px;
 //   border:1px solid red;
 // }
-
+.c4p--user-profile-image {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 100%;
+  text-transform: uppercase;
+  background: #0072c3;
+}
 
 .bx--modal-content {
   height: 30vh;
@@ -132,6 +147,22 @@ a.bx--side-nav__link[aria-current=page]::before, a.bx--side-nav__link--current::
   // text-align: center;
   
 }
+.bx--side-nav__submenu:focus {
+  outline: 2px solid var(--cds-ui-navbar) !important;
+  outline-offset: -2px;
+  
+}
+// li.bx--side-nav__item--active{
+//   background: red !important;
+// }
+// li.bx--side-nav__item{
+//   background: green !important;
+// }
+
+// .bx--side-nav__submenu:focus {
+//   outline: 2px solid var(--cds-focus, #0f62fe);
+//   outline-offset: -2px;
+// }
 
 .profile-info-image-icon {
   position: relative;

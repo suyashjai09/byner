@@ -17,32 +17,22 @@ import './signin.scss'
 import { MultiFactorAuthentication } from '../../Components/MultiFactorAuthentication/MultiFactorAuthentication';
 import { Loader } from '../../Components/Loader/Loader';
 import { AuthContext } from '../../sdk/context/AuthContext';
+import { BaseURL } from '../../sdk/constant';
 
 const Signin = () => {
 
-    let navigate = useNavigate();
-    // const { authenticate } = useContext(AccountContext);
+    const navigate = useNavigate();
     const authContext = useContext(AuthContext)
-
     const [askForPassword, setAskForPassword] = useState(true);
     const [loading, setLoading] = useState(false);
     const [loadingSuccess, setLoadingSuccess] = useState(false);
     const [errorNotification, setErrorNotification] = useState({});
     const [serverErrorNotification, setServerErrorNotification] = useState({});
     const [multiFactorAuthEnabled, setMultiFactorAuthEnable] = useState(false);
-
-    const [submitText, setSubmitText] = useState("Continue");
-
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-
     const [verificationCode, setVerificationCode] = useState("");
-
     const emailInput = useRef(null);
-    const passwordInput = useRef(null);
-
-    console.log(askForPassword, "check")
-
     const validateEmail = (email) => {
         return String(email)
             .toLowerCase()
@@ -56,6 +46,12 @@ const Signin = () => {
         if (email.length == 0) {
             setErrorNotification({
                 title: "Email should not be blank"
+            });
+        }
+        else if(!validateEmail(email))
+        {
+            setErrorNotification({
+                title: "Enter valid email"
             });
         }
         else {
@@ -89,12 +85,12 @@ const Signin = () => {
                     email: email,
                     password: password,
                 }
-               const response = await authContext.signin(data)
+               const response = await authContext.signin(data,false)
                if(response !== undefined){
                 // setError(`${response}`)
                 // setOpen(true);
                 }
-                // const response = await fetch(`https://w5i6csz6w9.execute-api.eu-central-1.amazonaws.com/Stage/login`, {
+                // const response = await fetch(`${BaseURL}/login`, {
                 //     method: 'POST',
                 //     body: JSON.stringify(data),
                 //     headers: {
@@ -170,9 +166,9 @@ const Signin = () => {
                                                 <div className="error-notification-box-inactive"></div>
                                             )
                                         }
-                                        <p className="register-text body-01">Don't have an account? <Link className="underlined-link" href="/signup">Create an IBMid</Link></p>
+                                        <p className="register-text body-01">Don't have an account? <Link className="underlined-link" onClick={()=>{navigate("/signup")}}>Create an IBMid</Link></p>
                                         <div className='login-input-wrapper' >
-                                            <FormLabel className='input-label' >IBMid <Link className="forgot-link" href="/forgotpassword">Forgot ID?</Link></FormLabel>
+                                            <FormLabel className='input-label' >IBMid <Link className="forgot-link" onClick={()=>{navigate("/forgotpassword")}}>Forgot ID?</Link></FormLabel>
                                             <TextInput
                                                 ref={emailInput}
                                                 id="email"
@@ -197,7 +193,7 @@ const Signin = () => {
                                         <Button
 
                                             type="submit"
-                                            iconDescription={submitText}
+                                            iconDescription={""}
                                             size="xl"
                                             className="submit-button"
                                         >{"Continue"}</Button>
@@ -213,7 +209,7 @@ const Signin = () => {
                                             <Heading>Login In</Heading>
                                             <p className="register-text body-01">Logging in as {email}&nbsp; <Link className="underlined-link" style={{ cursor: 'pointer' }} onClick={() => { setAskForPassword(true) }}> Not you?</Link></p>
                                             <div className='login-input-wrapper' >
-                                                <FormLabel className='input-label' >Password <Link className="forgot-link" href="/forgotpassword">Forgot Password?</Link></FormLabel>
+                                                <FormLabel className='input-label' >Password <Link className="forgot-link" onClick={()=>{navigate("/forgotpassword")}}>Forgot Password?</Link></FormLabel>
                                                 <PasswordInput
                                                     type="password"
                                                     className="login-form-input"
@@ -237,7 +233,7 @@ const Signin = () => {
                                                 </div>) :
                                                 (<Button
                                                     type="submit"
-                                                    iconDescription={submitText}
+                                                    iconDescription={""}
                                                     size="xl"
                                                     className="submit-button"
                                                 >Login</Button>)}

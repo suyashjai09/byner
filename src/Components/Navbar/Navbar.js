@@ -2,12 +2,14 @@ import React from "react";
 import { render } from "react-dom";
 import {
   SideNav,
+  SideNavDivider,
   SideNavItems,
   SideNavLink,
   SideNavMenu,
   SideNavMenuItem
 } from 'carbon-components-react';
 import { useNavigate } from "react-router-dom";
+import './Navbar.scss'
 import { Notification20, UserAvatar20, Switcher20,Search20,
   AppSwitcher20 } from '@carbon/icons-react';
 export const Navbar = ({isSideNavExpanded,onClickSideNavExpand}) => {
@@ -30,57 +32,70 @@ export const Navbar = ({isSideNavExpanded,onClickSideNavExpand}) => {
             isRail 
             expanded={isSideNavExpanded} 
             >
-              <SideNavItems>
-                <SideNavLink renderIcon={Search20} title="Data Table" onClick={()=>{navigate("/datatable")}}>Data Table</SideNavLink>
-                <SideNavLink renderIcon={Fade16} title="Side Panel" onClick={()=>{navigate("/sidepanel")}}>Side Panel</SideNavLink> 
-                <SideNavLink renderIcon={Fade16} title="Tear Sheet" onClick={()=>{navigate("/tearsheet")}}>TearSheet</SideNavLink>
+              <SideNavItems className="side-nav">
+                <SideNavLink renderIcon={Search20} title="Data Table" onClick={()=>{navigate("/datatable")}}>Data Table</SideNavLink> 
+                {/* <SideNavLink renderIcon={Fade16} title="Side Panel" onClick={()=>{navigate("/sidepanel")}}>Side Panel</SideNavLink> 
+                <SideNavLink renderIcon={Fade16} title="Tear Sheet" onClick={()=>{navigate("/tearsheet")}}>TearSheet</SideNavLink> */}
                  
-                {/* <SideNavMenu renderIcon={Fade16} title="Category title">
+                 <SideNavMenu renderIcon={Fade16} title="Category title">
                   <SideNavMenuItem
                     aria-current="page"
-                    href="javascript:void(0)"
                   >
-                    Link
-                  </SideNavMenuItem>
-                  <SideNavMenuItem href="javascript:void(0)">
-                    Link
+                    Link1
                   </SideNavMenuItem>
                 </SideNavMenu>
-                <SideNavMenu renderIcon={Fade16} title="Category title">
-                  <SideNavMenuItem
-                    aria-current="page"
-                    href="javascript:void(0)"
-                  >
-                    Link
-                  </SideNavMenuItem>
-                  <SideNavMenuItem href="javascript:void(0)">
-                    Link
-                  </SideNavMenuItem>
-                </SideNavMenu>
-                <SideNavMenu renderIcon={Fade16} title="Category title">
-                  <SideNavMenuItem
-                    aria-current="page"
-                    href="javascript:void(0)"
-                  >
-                    Link
-                  </SideNavMenuItem>
-                  <SideNavMenuItem href="javascript:void(0)">
-                    Link
-                  </SideNavMenuItem>
-                </SideNavMenu>
-                <SideNavMenu renderIcon={Fade16} title="Category title">
-                  <SideNavMenuItem
-                    aria-current="page"
-                    href="javascript:void(0)"
-                  >
-                    Link
-                  </SideNavMenuItem>
-                  <SideNavMenuItem href="javascript:void(0)">
-                    Link
-                  </SideNavMenuItem>
-                </SideNavMenu> */}
               </SideNavItems>
             </SideNav>
+            {/* <SideNav
+                aria-label="Side navigation"
+                expanded={isSideNavExpanded}
+                isRail
+              >
+                <SideNavItems>
+                  <SideNavMenuItem aria-current="page"    >
+                    Dashboard
+                  </SideNavMenuItem>
+                  <SideNavDivider/>
+                  <SideNavMenu title="Settings">
+                    <SideNavMenuItem >
+                      Setting 1
+                    </SideNavMenuItem>
+                    <SideNavMenuItem >
+                      Setting 2
+                    </SideNavMenuItem>
+                    <SideNavMenuItem >
+                      Setting 3
+                    </SideNavMenuItem>
+                  </SideNavMenu>
+                </SideNavItems>
+              </SideNav> */}
         </div>
     )
 }
+
+
+/**
+ * <SideNav
+                aria-label="Side navigation"
+                expanded={isSideNavExpanded}
+                isPersistent={false}
+              >
+                <SideNavItems>
+                  <SideNavMenuItem aria-current="page"    >
+                    Dashboard
+                  </SideNavMenuItem>
+                  <SideNavDivider/>
+                  <SideNavMenu title="Settings">
+                    <SideNavMenuItem >
+                      Setting 1
+                    </SideNavMenuItem>
+                    <SideNavMenuItem >
+                      Setting 2
+                    </SideNavMenuItem>
+                    <SideNavMenuItem >
+                      Setting 3
+                    </SideNavMenuItem>
+                  </SideNavMenu>
+                </SideNavItems>
+              </SideNav>
+ */

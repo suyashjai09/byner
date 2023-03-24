@@ -15,8 +15,8 @@
         max-width: 500px;
         width: calc(100% - 40px);
         margin-bottom: 28px;
-        min-width: 320px;
-        
+        // min-width: 320px;
+
         overflow: hidden;
 
         .cds--form {
@@ -27,7 +27,7 @@
             flex-direction: column;
             justify-content: space-between;
 
-            .checkbox-item{
+            .checkbox-item {
                 margin: 40px 0px 0px;
                 margin: 40px 0px 0px;
                 display: flex;
@@ -39,7 +39,7 @@
         .login-input-wrapper {
             width: 100%;
             margin-top: 24px;
-         
+
 
             label {
                 width: 100%;
@@ -63,7 +63,7 @@
 
     .fields-container {
         width: 100%;
-       
+
         width: 100%;
 
         display: flex;
@@ -78,6 +78,22 @@
             width: 250px;
             height: 64px;
             cursor: pointer;
+        }
+    }
+}
+
+@media screen and (max-width:300px) {
+    .multifactor-container {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #000;
+
+        .box-container {
+            h1 {
+                font-size: 32px;
+            }
         }
     }
 }

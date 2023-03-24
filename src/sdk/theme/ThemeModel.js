@@ -47,7 +47,6 @@ export const ThemeModel = React.memo(({ openModel, setModelOpen }) => {
 
       <div className="carbon-theme-dropdown">
         <Dropdown
-          direction="down"
           ariaLabel="Theme dropdown"
           id="theme-dropdown"
           items={themeData}

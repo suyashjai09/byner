@@ -1,7 +1,8 @@
-import { useNavigate,useLocation } from "react-router-dom";
-import { useEffect,useReducer,createContext ,useMemo} from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useReducer, createContext, useMemo } from "react";
+import { BaseURL } from "../constant";
 const initialState = {
-  signin: ({ username, password }) =>
+  signin: () =>
     Promise.resolve(null),
   signout: () => Promise.resolve(null),
   user: null,
@@ -16,12 +17,10 @@ export const AuthContext = createContext(initialState)
 const { Provider, Consumer } = AuthContext;
 const simpleReducer = (state, payload) => ({ ...state, ...payload });
 
-
 export const AuthProvider = ({ children }) => {
 
   const navigate = useNavigate();
   const location = useLocation();
-
   const [state, setState] = useReducer(simpleReducer, initialState);
 
 
@@ -51,43 +50,56 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (state.token !== null) {
-      if (location.pathname === '/signin' || location.pathname === '/') {
+    const tokenCheck=localStorage.getItem("token");
+    if (tokenCheck !== null) {
+      if (location.pathname === '/signin' || location.pathname === '/' || location.pathname === '/forgotpassword' || location.pathname === '/signup') {
         navigate('/dashboard')
       }
     } else {
-      if (location.pathname !== '/signin') {
-        navigate('/signin')
+      if (location.pathname === '/' || location.pathname === '/dashboard' || location.pathname === '/datatable' || location.pathname === '/tearsheet') {
+        navigate('/signin');
       }
+
     }
   }, [location, state.token]);
 
 
-  const signin = async ({ username, password }) => {
+  const signin = async (data, isMfa) => {
     try {
+      debugger;
       setState({ isLoading: true, isValidLogin: false });
-     // const response = await fetch(`https://w5i6csz6w9.execute-api.eu-central-1.amazonaws.com/Stage/login`, {
-                //     method: 'POST',
-                //     body: JSON.stringify(data),
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //     },
-                // })
+      let endPoint = "";
+      if (isMfa) {
+        endPoint = "mfa";
+      }
+      else {
+        endPoint = "login";
+      }
+      //  const response = await fetch(`${BaseURL}/${endPoint}`, {
+      //                 method: 'POST',
+      //                 body: JSON.stringify(data),
+      //                 headers: {
+      //                     'Content-Type': 'application/json',
+      //                 },
+      //             })
+      //   if(response.ok){
+
+      //   }
+      const { token, name, email } = { token: "1235", name: "suyash", email: "xyz" };
       // const { token, name, email } = await fetch(
-      //   `/login`,
+      //   `${BaseURL}/${endPoint}`,
       //   {
       //     method: "POST",
-      //     body: JSON.stringify({ username, password }),
+      //     body: JSON.stringify(data),
       //     headers: {
       //       "Content-type": "application/json; charset=UTF-8",
       //     },
       //   }
       // ).then((res) => {
-      //   const data = { token: "1235", name: "suyash", email: "xyz" }
-      //  debugger;
-      //   return data
-      // })
-      const { token,email }={ token: "12345",email: "xyz" };
+      //   // const data = { token: "1235", name: "suyash", email: "xyz" }
+      //   const apiData=res.json()
+      //    return apiData
+      // }) 
       if (token) {
         setState({
           isLoggedIn: true,

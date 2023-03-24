@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect ,useContext} from 'react';
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -9,8 +9,12 @@ import {
 import { TextInput
 } from 'carbon-components-react';
 import './MultiFactorAuthentication.scss'
+import { AuthContext } from '../../sdk/context/AuthContext';
+import { Loader } from '../Loader/Loader';
+import { BaseURL } from '../../sdk/constant';
 export const MultiFactorAuthentication = ({ email, errorNotification, loading, setLoading, setErrorNotification }) => {
     const [verificationCode, setVerificationCode] = useState("");
+    const authContext = useContext(AuthContext)
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
@@ -27,9 +31,10 @@ export const MultiFactorAuthentication = ({ email, errorNotification, loading, s
             const fetchData = async () => {
                 const data = {
                     email: email,
-                    verificationCode: verificationCode,
+                    verificationCode: verificationCode
                 }
-                // const response = await fetch(`https://w5i6csz6w9.execute-api.eu-central-1.amazonaws.com/Stage/login`, {
+                const response = await authContext.signin(data,true);
+                // const response = await fetch(`${BaseURL}/login`, {
                 //     method: 'POST',
                 //     body: JSON.stringify(data),
                 //     headers: {
@@ -37,9 +42,9 @@ export const MultiFactorAuthentication = ({ email, errorNotification, loading, s
                 //     },
                 // })
 
-                setTimeout(() => {
-                    setLoading(false);
-                }, 2000);
+                // setTimeout(() => {
+                //     setLoading(true);
+                // }, 2000);
             }
             fetchData();
         }
@@ -67,12 +72,22 @@ export const MultiFactorAuthentication = ({ email, errorNotification, loading, s
                         </div>
                     </div>
                     <div className='fields-container'>
-                        <Button
+                    {loading ?
+                                            (<div className='forgot-password-loader-signin'>
+                                                <Loader />
+                                            </div>) :
+                                            (<Button
+                                                type="submit"
+                                                // iconDescription={submitText}
+                                                size="xl"
+                                                className="submit-button"
+                                            >Login</Button>)}
+                        {/* <Button
                             type="submit"
                             // iconDescription={submitText}
                             size="xl"
                             className="submit-button"
-                        >Login</Button>
+                        >Login</Button> */}
                     </div>
 
                 </Form>

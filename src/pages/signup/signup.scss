@@ -4,7 +4,7 @@
 }
 .error-notification{
   display: flex;
-  border-left: 3px solid var(--cds-support-error-inverse, #fa4d56);
+  border-left: 3px solid  #fa4d56;
   background: #393939;
   width: 400px;
   height: 48px;
@@ -36,17 +36,17 @@
   height: 32px;
 }
 .account{
-  border-left: 2px solid var(--cds-ui-04, #6f6f6f);
-  background-color: var(--cds-ui-01, #262626);
+  border-left: 2px solid  #6f6f6f;
+  background-color:  #262626;
   padding: 1rem;
   position: relative;
   margin-bottom: 0.5rem;
   width: 400px;
-  height:320px;
+  height:330px;
 }
 .account-edit{
-  border-left: 2px solid var(--cds-ui-04, #6f6f6f);
-  background-color: var(--cds-ui-01, #262626);
+  border-left: 2px solid #6f6f6f;
+  background-color:  #262626;
   padding: 1rem;
   position: relative;
   margin-bottom: 0.5rem;
@@ -125,6 +125,7 @@
     line-height: 1rem;
     vertical-align: baseline;
     width: 100%;
+    margin-top: 8px;
   }
   input{
 
@@ -163,7 +164,8 @@
 }
 
 label[for=password-input]{
-  color: white
+  color: white;
+  margin-top: 12px;
 }
 .accordian{
   background-color: #000;
@@ -213,7 +215,9 @@ label[for=password-input]{
     line-height: 1rem;
     vertical-align: baseline;
     width: 100%;
+    
   }
+  
   input{
 
     background-color:white; 
@@ -243,6 +247,17 @@ label[for=password-input]{
   display: flex;
     flex-direction: column;
     gap: 16px;
+    label{
+      letter-spacing: var(--cds-label-01-letter-spacing, 0.32px);
+      display: inline-block;
+      margin-bottom: 0.5rem;
+      color:#ffff;
+      font-weight: 400;
+      line-height: 1rem;
+      vertical-align: baseline;
+      width: 100%;
+      
+    }
     input{
 
       background-color:white; 
@@ -264,6 +279,10 @@ label[for=password-input]{
 }
 .checkbox{
   width: 20px !important;
+}
+
+.create-account{
+  margin-top: 16px;
 }
 
 @media screen and (max-width:600px) {
@@ -339,3 +358,36 @@ label[for=password-input]{
     cursor: pointer;
   }
 }
+.account-info{
+  border-left: 2px solid  #6f6f6f;
+  background-color: #262626;
+  padding: 1rem;
+  position: relative;
+  margin-bottom: 0.5rem;
+  width: 400px;
+  color: #ffff;
+  display: flex;
+    flex-direction: column;
+    gap: 16px;
+    label{
+      letter-spacing:  0.32px;
+      display: inline-block;
+      color:#ffff;
+      font-weight: 400;
+      line-height: 1rem;
+      vertical-align: baseline;
+      width: 100%;
+      
+    }
+  }
+
+  .create-account-loader{
+    margin-top: 8px;
+    display: flex;
+    color: white;
+    width: 100%;
+    gap: 16px;
+    p{
+      font-size: 12px;
+    }
+  }

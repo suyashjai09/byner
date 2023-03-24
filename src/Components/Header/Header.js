@@ -17,7 +17,7 @@ import '../../sdk/theme/Themes.scss'
 import { ProfileDropdown } from '../ProfileDropdown/ProfileDropdown';
 import Dashboard from '../Dashboard/Dashboard';
 import { Outlet } from 'react-router-dom';
-export const CommonHeader = ({ className }) => {
+export const CommonHeader = () => {
   return (
     <div >
       <HeaderContainer
@@ -41,8 +41,7 @@ const HeaderComponent = ({ isSideNavExpanded, onClickSideNavExpand }) => {
           onClick={onClickSideNavExpand}
           isActive={isSideNavExpanded}
         />
-        <HeaderName prefix="IBM">
-        </HeaderName>
+        <HeaderName prefix="IBM">Platform</HeaderName>
         <HeaderGlobalBar>
           <HeaderGlobalAction aria-label="Search" onClick={() => { }}>
             <Search20 />

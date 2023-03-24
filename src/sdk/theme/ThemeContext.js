@@ -34,6 +34,8 @@ export const ThemeProvider=(props)=> {
   const [state, dispatch] = useReducer(themeReducer, initialState);
 
   useEffect(() => {
+    const bodyElement = document.body;
+    bodyElement.className =themeData[0].value ;
     dispatch({type: themeData[0]})
   }, [])
   return (

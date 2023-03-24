@@ -1,4 +1,4 @@
-import React, { useState, useRef, useContext, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import 'react-telephone-input/css/default.css'
 import {
     formatCreditCardNumber,
@@ -6,7 +6,6 @@ import {
     formatExpirationDate,
     formatFormData
 } from "../../../src/utils/util.js";
-// import "react-credit-cards/es/styles-compiled.css";
 import {
     TextInput,
     Heading,
@@ -15,28 +14,24 @@ import {
     Select,
     SelectItem,
 } from '@carbon/react';
-import { PasswordInput
+import {
+    PasswordInput
 } from 'carbon-components-react';
-
-import { ArrowRight, ArrowLeft } from '@carbon/react/icons';
 import { useNavigate } from "react-router-dom";
-// import { CognitoUser, CognitoUserAttribute } from 'amazon-cognito-identity-js'
-// import UserPool from "../../UserPool";
-// import { AccountContext } from '../../components/Accounts';
-// import countries from './countries';
 import '../signup/signup.scss'
 import { PasswordStrength } from '../../Components/PasswordStrength/PasswordStrength';
 import countrylist from '../../data/countrylist';
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
 import { Loader } from '../../Components/Loader/Loader.js';
+import { BaseURL } from '../../sdk/constant.js';
+
 
 
 const Signup = () => {
+    const navigate = useNavigate();
+    const [errorNotification, setErrorNotification] = useState({});
 
-    // var ReactTelInput = require('react-telephone-input');
-    const [errorNotification, setErrorNotification] = useState({title: "Enter Valid Verification code.Try again"});
-   
     const [loading, setLoading] = useState(false);
     const [loadingSuccess, setLoadingSuccess] = useState(false);
     const [password, setPassword] = useState('');
@@ -46,7 +41,7 @@ const Signup = () => {
     const [passwordStrengthWidth, setpaswordStrengthWidth] = useState(0);
     const [passwordIsValid, setPasswordIsValid] = useState(true);
     const [emailIsValid, setEmailValid] = useState(true);
-    const [activeStep, setActiveStep] = useState(2);
+    const [activeStep, setActiveStep] = useState(1);
     const [verificationCode, setVerificationCode] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -74,8 +69,10 @@ const Signup = () => {
     const [isVerifyEmailInfoError, setIsVerifyEmailError] = useState(false);
     const [isCreateAccountError, setIsCreateAccountError] = useState(false);
     const [userId, setUserId] = useState('');
-    console.log(isError, "check")
+    const [message, setMessage] = useState('creting account ...');
+    const accountInfoButtonDisabled = !passwordIsValid || !emailIsValid || email.length == 0 || password.length == 0 || isAccountInfoError;
     const personalInfoButtonDisabled = firstName.length == 0 || lastName.length == 0 || city.length == 0 || state.length == 0 || postalCode.length == 0 || phoneNumber.length == 0 || addressLine1.length == 0;
+    const verificationEmailButtonDisabled = verificationCode.length == 0 || isVerifyEmailInfoError;
     const handleFirstNameChange = (value) => {
         setFirstName(value);
     }
@@ -132,50 +129,46 @@ const Signup = () => {
 
     const handleSignupRequest = () => {
 
+
         const fetchData = async () => {
-            setLoading(true);
-            setLoadingSuccess(true);
-            const data = {
-                email: email,
-                password: password,
-            }
+            try {
+                setLoading(true);
+                const data = {
+                    email: email,
+                    password: password,
+                }
+                const response = await fetch(`${BaseURL}/signup`, {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
 
-            // const response = await fetch(`https://w5i6csz6w9.execute-api.eu-central-1.amazonaws.com/Stage/signup`, {
-            //     method: 'POST',
-            //     body: JSON.stringify(data),
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //     },
-            // })
-
-            // setTimeout(() => {
-            //     // setLoadingSuccess(false);
-            //     //  setLoading(false);
-            //     // setActiveStep(2);
-            //   }, 8000);
-            // //   setTimeout(() => {
-            // //        setSuccess(false);
-            // //           setDescription('Submitting...');
-            // //               setAriaLive('off');
-            // // }, 1500);
-            // if(true){
-            //     setErrorNotification({
-            //         title: "Email or password error.Try again"
-            //     });
-            //     setIsError(true)
-            //     setIsAccountInfoError(true);
-            //     setActiveStep(1);
-
-            // }
-            // else {
-            //     setActiveStep(1);
-            //     setIsAccountInfoUpdated(true);
-            // }
-            setTimeout(() => {
+                // const response = {
+                //     ok: true,
+                //     status: 200,
+                //     error: 'email exist',
+                // }
+                if (response.ok) {
+                    setActiveStep(2);
+                    setIsAccountInfoUpdated(true);
+                    setIsError(false);
+                    setIsAccountInfoError(false);
+                }
+                else if (response.status === 500) {
+                    setIsError(true)
+                    setIsAccountInfoError(true);
+                    setActiveStep(1);
+                    setErrorNotification({
+                        title: response.error
+                    })
+                }
                 setLoading(false);
-                setActiveStep(2)
-            }, 2000);
-
+            }
+            catch (e) {
+                setLoading(false)
+            }
 
         }
         fetchData();
@@ -186,90 +179,127 @@ const Signup = () => {
     }
 
     const handleVerifyEmail = () => {
-        setLoading(true);
+
         const fetchData = async () => {
-            const data = {
-                email: email,
-                code: verificationCode,
-            }
-            // const response = await fetch(`https://w5i6csz6w9.execute-api.eu-central-1.amazonaws.com/Stage/confirm-email`, {
-            //     method: 'POST',
-            //     body: JSON.stringify(data),
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //     },
-            // })
-
-            
-
-            if(true){
-                setTimeout(() => {
-                    setLoading(false);
-                    
-                    setErrorNotification({
-                        title: "Enter Valid Verification code.Try again"
-                    });
+            try {
+                setLoading(true);
+                const data = {
+                    email: email,
+                    code: verificationCode,
+                }
+                // const response = await fetch(`${BaseURL}/confirm-email`, {
+                //     method: 'POST',
+                //     body: JSON.stringify(data),
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //     },
+                // })
+                const response = {
+                    ok: true,
+                    status: 500,
+                    error: 'invalid verification code ',
+                }
+                if (response.ok) {
+                    setActiveStep(3);
+                    setIsError(false)
+                    setIsVerifyEmailError(false);
+                }
+                else if (response.status === 500) {
                     setIsError(true)
                     setIsVerifyEmailError(true);
-                    setActiveStep(2);
-                }, 2000);
-                
+                    setActiveStep(1);
+                    setErrorNotification({
+                        title: response.error
+                    })
+                }
+                setLoading(false);
 
+                // if (true) {
+                //     setTimeout(() => {
+                //         setLoading(false);
+
+                //         setErrorNotification({
+                //             title: "Enter Valid Verification code.Try again"
+                //         });
+                //         setIsError(true)
+                //         setIsVerifyEmailError(true);
+                //         setActiveStep(2);
+                //     }, 2000);
+
+
+                // }
+                // else {
+                //     setActiveStep(1);
+                //     setIsAccountInfoUpdated(true);
+                // }
+                // setActiveStep(3);
+                // return response
             }
-            else {
-                setActiveStep(1);
-                setIsAccountInfoUpdated(true);
+            catch (e) {
+                setLoading(false);
             }
-            // setActiveStep(3);
-            // return response
         }
         // setActiveStep(3);
         fetchData();
     }
 
     const handleCreateAccount = () => {
-
         const fetchData = async () => {
-            const data = {
-                id: userId,
-                username: email,
-                fullName: firstName + " " + lastName,
-                country: country,
-                addressLine: addressLine1,
-                addressLine2: addressLine2,
-                city: city,
-                postalCode: postalCode,
-                state: state,
-                phoneNumber: phoneNumber,
-                organizationName: organizationName,
-                VAT: vatNumber,
-                organisationCountry: organizationCountry,
-                isAgreementSigned: isChecked,
+            try {
+                setLoading(true);
+                const data = {
+                    id: userId,
+                    username: email,
+                    fullName: firstName + " " + lastName,
+                    country: country,
+                    addressLine: addressLine1,
+                    addressLine2: addressLine2,
+                    city: city,
+                    postalCode: postalCode,
+                    state: state,
+                    phoneNumber: phoneNumber,
+                    organizationName: organizationName,
+                    VAT: vatNumber,
+                    organisationCountry: organizationCountry,
+                    isAgreementSigned: isChecked,
+                }
+                const response = await fetch(`${BaseURL}/create-user`, {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
+
+                // if(true){
+                //     setErrorNotification({
+                //         title: "Enter Valid Verification code.Try again"
+                //     });
+                //     setIsError(true)
+                //     setIsVerifyEmailError(true);
+                //     setActiveStep(1);
+
+                // }
+                // else {
+                //     setActiveStep(1);
+                //     setIsAccountInfoUpdated(true);
+                // }
+                // setActiveStep(3);
+                setLoading(false);
+
             }
-            const response = await fetch(`https://w5i6csz6w9.execute-api.eu-central-1.amazonaws.com/Stage/create-user`, {
-                method: 'POST',
-                body: JSON.stringify(data),
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            })
+            catch (e) {
+                setMessage("account created ... moving to signin page")
+                setTimeout(() => {
 
-            // if(true){
-            //     setErrorNotification({
-            //         title: "Enter Valid Verification code.Try again"
-            //     });
-            //     setIsError(true)
-            //     setIsVerifyEmailError(true);
-            //     setActiveStep(1);
+                    setLoading(false);
+                    navigate('/signin');
+                }, [4000])
+                //setLoading(false);
+            }
 
-            // }
-            // else {
-            //     setActiveStep(1);
-            //     setIsAccountInfoUpdated(true);
-            // }
-            // setActiveStep(3);
-            return response
         }
+        fetchData();
     }
     const handlePersonalInfo = () => {
 
@@ -281,6 +311,7 @@ const Signup = () => {
         setVatNumber(value);
         const gstRegex = /[0-9]{2}[A-Z]{3}[ABCFGHLJPTF]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}/;
         setGstValid(gstRegex.test(value))
+        console.log('test', gstRegex.test(value))
     }
 
     const handleTaxInfo = () => {
@@ -305,8 +336,8 @@ const Signup = () => {
     }
 
     const creditCardButtonDisabled = cardCVV.length == 0 || cardExpiryDate.length == 0 || cardNumber.length == 0;
-    const taxInfoButtonDisabled = organizationName.length == 0 || organizationCountry.length == 0 || (!isGstValid && vatNumber.length > 0);
-
+    const taxInfoButtonDisabled = organizationName.length == 0 || organizationCountry.length == 0 || (!isGstValid || vatNumber.length === 0);
+    console.log(organizationName.length == 0, organizationCountry.length == 0, !isGstValid, vatNumber.length > 0, "tex valid");
     useEffect(() => {
         // 👇️ scroll to top on page load
         console.log(errorNotification, 'check', isError)
@@ -314,7 +345,8 @@ const Signup = () => {
             document.getElementById("scroller").scroll(0, 0);
         }
     }, [isError]);
-    // console.log(taxInfoButtonDisabled, isAccountInfoUpdated, isProfileInfoUpdated, isTaxInfoUpdated, isChecked)
+
+    console.log(accountInfoButtonDisabled, verificationEmailButtonDisabled, personalInfoButtonDisabled, taxInfoButtonDisabled, creditCardButtonDisabled, 'ischeck', !isChecked, 'crete')
     return (
 
         <div id="scroller" style={{ overflow: 'auto', backgroundColor: '#000' }}>
@@ -389,7 +421,7 @@ const Signup = () => {
                     </div>) :
                     (<div className='account-edit'>
                         <div className='account-header-edit'>
-                            <div class='box'>
+                            <div className='box'>
                                 <p className='text-heading'>Account information</p>
                                 <button className='edit-button' onClick={() => handleEditClick("1")}>Edit</button>
                             </div>
@@ -398,7 +430,7 @@ const Signup = () => {
                         </div>
                     </div>)}
                 {activeStep == 2 ?
-                    (<div id="verify-section" class="email-verification">
+                    (<div id="verify-section" className="email-verification">
                         <p>Verify Email</p>
                         <p>We sent a 7-digit verification code to {email}.</p>
                         <p>This code is valid for 30 minutes.</p>
@@ -406,11 +438,6 @@ const Signup = () => {
                             labelText="Verification code"
                             value={verificationCode}
                             onChange={(e) => handleVerificationCodeChange(e.target.value)}
-                        // invalid={!emailIsValid}
-                        // invalidText={
-                        //     !emailIsValid
-                        //         ? 'Enter valid email address' : null
-                        // }
                         />
                         {loading ?
                             (
@@ -420,8 +447,8 @@ const Signup = () => {
                             ) :
                             (
                                 <div className='verify-button-class'>
-                                    <button disabled={verificationCode.length == 0 && isVerifyEmailInfoError}
-                                        className={verificationCode.length == 0 && isVerifyEmailInfoError ? 'submit-button-disabled' : 'submit-button'} onClick={() => handleVerifyEmail()}>
+                                    <button disabled={verificationCode.length == 0 || isVerifyEmailInfoError}
+                                        className={verificationCode.length == 0 || isVerifyEmailInfoError ? 'submit-button-disabled' : 'submit-button'} onClick={() => handleVerifyEmail()}>
                                         Submit
                                     </button>
                                     <button
@@ -430,7 +457,7 @@ const Signup = () => {
                                     </button>
                                 </div>)}
                     </div>) :
-                    (<div id="verify-section" class="email-verification">
+                    (<div id="verify-section" className="email-verification">
                         <p>Verify Email</p>
                     </div>)}
                 {activeStep == 3 ?
@@ -501,8 +528,8 @@ const Signup = () => {
                             </button>
                         </div>
                     </div>) :
-                    (isProfileInfoUpdated && activeStep > 3 ? (<div id="verify-section" class="email-verification">
-                        <div class='box'>
+                    (isProfileInfoUpdated && activeStep > 3 ? (<div id="verify-section" className="email-verification">
+                        <div className='box'>
                             <p className='text-heading'>Personal information</p>
                             <button className='edit-button' onClick={() => handleEditClick("3")}>Edit</button>
                         </div>
@@ -514,8 +541,8 @@ const Signup = () => {
                         <p className='text-heading-edit'>{postalCode}</p>
                         <p className='text-heading-edit'>{phoneNumber}</p>
                     </div>) : (
-                        <div id="verify-section" class="email-verification">
-                            <div class='box'>
+                        <div id="verify-section" className="email-verification">
+                            <div className='box'>
                                 <p className='text-heading'>Personal information</p>
                             </div>
                         </div>
@@ -560,8 +587,8 @@ const Signup = () => {
                             </button>
                         </div>
                     </div>) :
-                    (isTaxInfoUpdated && activeStep > 4 ? (<div id="verify-section" class="email-verification">
-                        <div class='box'>
+                    (isTaxInfoUpdated && activeStep > 4 ? (<div id="verify-section" className="email-verification">
+                        <div className='box'>
                             <p className='text-heading'>Tax information</p>
                             <button className='edit-button' onClick={() => handleEditClick("4")}>Edit</button>
                         </div>
@@ -569,8 +596,8 @@ const Signup = () => {
                         <p className='text-heading-edit'>{country}</p>
                         <p className='text-heading-edit'>{city}</p>
                     </div>) : (
-                        <div id="verify-section" class="email-verification">
-                            <div class='box'>
+                        <div id="verify-section" className="email-verification">
+                            <div className='box'>
                                 <p className='text-heading'>Tax information</p>
                             </div>
                         </div>
@@ -588,7 +615,6 @@ const Signup = () => {
                                 placeholder="Card Number"
                                 pattern="[\d| ]{16,22}"
                                 value={cardNumber}
-                                required
                                 onChange={handleInputChange}
 
                             />
@@ -602,7 +628,6 @@ const Signup = () => {
                                 placeholder="Valid Thru"
                                 pattern="\d\d/\d\d"
                                 value={cardExpiryDate}
-                                required
                                 onChange={handleInputChange}
                             />
                         </div>
@@ -614,7 +639,6 @@ const Signup = () => {
                                 placeholder="CVC"
                                 pattern="\d{3,4}"
                                 value={cardCVV}
-                                required
                                 onChange={handleInputChange}
                             />
                         </div>
@@ -627,22 +651,22 @@ const Signup = () => {
                             </button>
                         </div>
                     </div>) :
-                    (isCardInfoUpdated && activeStep > 5 ? (<div id="verify-section" class="email-verification">
-                        <div class='box'>
+                    (isCardInfoUpdated && activeStep > 5 ? (<div id="verify-section" className="email-verification">
+                        <div className='box'>
                             <p className='text-heading'>Card info</p>
-                            <button className='edit-button' onClick={() => handleEditClick("4")}>Edit</button>
+                            <button className='edit-button' onClick={() => handleEditClick("5")}>Edit</button>
                         </div>
                         <p className='text-heading-edit'>**** **** **** ****</p>
                         <p className='text-heading-edit'>**/**</p>
                     </div>) : (
-                        <div id="verify-section" class="email-verification">
-                            <div class='box'>
+                        <div id="verify-section" className="email-verification">
+                            <div className='box'>
                                 <p className='text-heading'>Card info</p>
                             </div>
                         </div>
                     ))}
-                {activeStep == "5" ?
-                    (<div id="verify-section" className='vat-info'>
+                {activeStep == "6" ?
+                    (<div id="verify-section" className='account-info'>
                         <div className='account-header'>
                             <p className='text-heading'>Account notice</p>
                         </div>
@@ -655,18 +679,33 @@ const Signup = () => {
 
                     </div>) :
                     (
-                        <div id="verify-section" class="email-verification">
-                            <div class='box'>
+                        <div id="verify-section" className="email-verification">
+                            <div className='box'>
                                 <p className='text-heading'>Account  notice</p>
                             </div>
                         </div>
                     )}
-                <div >
-                    <button disabled={taxInfoButtonDisabled || isAccountInfoUpdated || isProfileInfoUpdated || isTaxInfoUpdated || isChecked}
-                        className={taxInfoButtonDisabled || isAccountInfoUpdated || isProfileInfoUpdated || isTaxInfoUpdated || isChecked ? 'submit-button-disabled' : 'submit-button'} onClick={() => handleCreateAccount()}>
-                        Create Account
-                    </button>
-                </div>
+                {/* <div className='create-account' >
+                        <button disabled={accountInfoButtonDisabled || verificationEmailButtonDisabled || personalInfoButtonDisabled || taxInfoButtonDisabled || creditCardButtonDisabled || !isChecked}
+                            className={accountInfoButtonDisabled || verificationEmailButtonDisabled || personalInfoButtonDisabled || taxInfoButtonDisabled || creditCardButtonDisabled || !isChecked ? 'submit-button-disabled' : 'submit-button'} onClick={() => handleCreateAccount()}>
+                            Create Account
+                        </button>
+                    </div> */}
+                {loading ?
+                    (
+                        <div className='create-account-loader'>
+                            <Loader />
+                            <p>{message}</p>
+                        </div>
+                    ) : (
+                        <div className='create-account' >
+                            <div className='create-account' >
+                                <button disabled={accountInfoButtonDisabled || verificationEmailButtonDisabled || personalInfoButtonDisabled || taxInfoButtonDisabled || creditCardButtonDisabled || !isChecked}
+                                    className={accountInfoButtonDisabled || verificationEmailButtonDisabled || personalInfoButtonDisabled || taxInfoButtonDisabled || creditCardButtonDisabled || !isChecked ? 'submit-button-disabled' : 'submit-button'} onClick={() => handleCreateAccount()}>
+                                    Create Account
+                                </button>
+                            </div>
+                        </div>)}
             </div>
         </div>
 
