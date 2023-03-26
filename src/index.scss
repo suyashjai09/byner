@@ -18,7 +18,8 @@
   --cds-layer:#fff;
 }
 .carbon-theme--g90{
-  --cds-ui-navbar: #262626;
+  --cds-ui-navbar: #161616;
+  --cds-icon-02:#c6c6c6;
 }
 
 body {
@@ -61,31 +62,36 @@ body {
   background-color: var(--cds-ui-background, #f4f4f4);
 }
 .bx--side-nav__item--active .bx--side-nav__submenu[aria-expanded=false]::before {
-  background-color: var(--cds-ui-background, #f4f4f4) !important;
+  // background-color: var(--cds-ui-background, #f4f4f4) !important;
 }
 .bx--side-nav__item--active .bx--side-nav__submenu[aria-expanded=false] {
   position: relative;
-  background-color: var(--cds-ui-background, #f4f4f4) !important;
-  color: #161616;
-}
-
-.bx--side-nav__menu a.bx--side-nav__link--current, .bx--side-nav__menu a.bx--side-nav__link[aria-current=page], a.bx--side-nav__link--current {
-  background-color: var(--cds-ui-background, #f4f4f4) !important;
-}
-
-.bx--side-nav__submenu {
-  background-color: var(--cds-ui-background, #f4f4f4) !important;
-}
-
-a.bx--side-nav__link[aria-current=page]::before, a.bx--side-nav__link--current::before {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 4px;
   background-color: var(--cds-ui-navbar, #f4f4f4) !important;
-  content: "";
+  color: var(--cds-text-02, #525252);
 }
+.bx--header__action--active {
+  border-right: 1px solid #393939;
+  border-bottom: 1px solid #393939 !important;
+  border-left: 1px solid #393939;
+}
+
+// .bx--side-nav__menu a.bx--side-nav__link--current, .bx--side-nav__menu a.bx--side-nav__link[aria-current=page], a.bx--side-nav__link--current {
+//   background-color: var(--cds-ui-background, #f4f4f4) !important;
+// }
+
+// .bx--side-nav__submenu {
+//   background-color: var(--cds-ui-background, #f4f4f4) !important;
+// }
+
+// a.bx--side-nav__link[aria-current=page]::before, a.bx--side-nav__link--current::before {
+//   position: absolute;
+//   top: 0;
+//   bottom: 0;
+//   left: 0;
+//   width: 4px;
+//   background-color: var(--cds-ui-navbar, #f4f4f4) !important;
+//   content: "";
+// }
 //  .bx--side-nav--expanded {
 //   width: 12rem;
 // }

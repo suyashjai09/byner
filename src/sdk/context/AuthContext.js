@@ -12,6 +12,7 @@ const initialState = {
   error: null,
   isLoading: false,
   isValidLogin: false,
+  theme:null,
 }
 export const AuthContext = createContext(initialState)
 const { Provider, Consumer } = AuthContext;
@@ -41,6 +42,7 @@ export const AuthProvider = ({ children }) => {
         isLoggedIn: false,
         name: null,
         email: null,
+        theme:null,
       });
     } finally {
       setState({
@@ -66,7 +68,6 @@ export const AuthProvider = ({ children }) => {
 
   const signin = async (data, isMfa) => {
     try {
-      debugger;
       setState({ isLoading: true, isValidLogin: false });
       let endPoint = "";
       if (isMfa) {
@@ -109,6 +110,9 @@ export const AuthProvider = ({ children }) => {
         });
         localStorage.setItem("token", token);
         localStorage.setItem("email", email);
+        localStorage.setItem("theme",'carbon-theme--white');
+        const bodyElement = document.body;
+        bodyElement.className = localStorage.getItem("theme") ;
         navigate("/dashboard");
 
       } else {
@@ -130,6 +134,7 @@ export const AuthProvider = ({ children }) => {
   const signout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("email");
+    localStorage.removeItem("theme");
     navigate("/signin");
     setState({
       user: null,

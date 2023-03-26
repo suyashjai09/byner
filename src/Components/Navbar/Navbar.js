@@ -33,13 +33,14 @@ export const Navbar = ({isSideNavExpanded,onClickSideNavExpand}) => {
             expanded={isSideNavExpanded} 
             >
               <SideNavItems className="side-nav">
-                <SideNavLink renderIcon={Search20} title="Data Table" onClick={()=>{navigate("/datatable")}}>Data Table</SideNavLink> 
+                <SideNavLink renderIcon={Search20} className="side-nav-link" title="Data Table" onClick={()=>{navigate("/datatable")}}>Data Table</SideNavLink> 
                 {/* <SideNavLink renderIcon={Fade16} title="Side Panel" onClick={()=>{navigate("/sidepanel")}}>Side Panel</SideNavLink> 
                 <SideNavLink renderIcon={Fade16} title="Tear Sheet" onClick={()=>{navigate("/tearsheet")}}>TearSheet</SideNavLink> */}
                  
-                 <SideNavMenu renderIcon={Fade16} title="Category title">
+                 <SideNavMenu renderIcon={Fade16} title="Category title" className="side-nav-menu">
                   <SideNavMenuItem
                     aria-current="page"
+                    className="side-nav-menu-item"
                   >
                     Link1
                   </SideNavMenuItem>

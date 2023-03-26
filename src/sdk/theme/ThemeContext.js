@@ -35,7 +35,7 @@ export const ThemeProvider=(props)=> {
 
   useEffect(() => {
     const bodyElement = document.body;
-    bodyElement.className =themeData[0].value ;
+    bodyElement.className = localStorage.getItem("theme") ;
     dispatch({type: themeData[0]})
   }, [])
   return (

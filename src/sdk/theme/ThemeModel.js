@@ -19,20 +19,41 @@ export const ThemeModel = React.memo(({ openModel, setModelOpen }) => {
     }
   ];
 
-  const [selectedItem,setItem] = useState(themeData[0]);
+  const [selectedItem, setItem] = useState(localStorage.getItem("theme") ==="carbon-theme--white"?themeData[0]:themeData[1]);
+  const handleTheme = () => {
+    const bodyElement = document.body;
+    bodyElement.className = selectedItem.value;
+    if (selectedItem.value === "carbon-theme--g90") {
+      setItem(themeData[1]);
+      localStorage.setItem("theme", themeData[1].value)
+    }
+    else if (selectedItem.value === "carbon-theme--white") {
+      setItem(themeData[0]);
+      localStorage.setItem("theme", themeData[0].value)
+    }
+    setModelOpen(false);
+  }
+
   const cancelTheme = () => {
     const bodyElement = document.body;
-    bodyElement.className = prevState;
-    if(bodyElement.className ==="carbon-theme--g90 bx--body--with-modal-open")
-    setItem(themeData[1]);
-    else 
-    setItem(themeData[0]);
+    const currentTheme = localStorage.getItem("theme");
+    if (selectedItem.value !== currentTheme) {
+      if (currentTheme === "carbon-theme--g90") {
+        setItem(themeData[1]);
+        localStorage.setItem("theme", themeData[1].value)
+        bodyElement.className = themeData[1].value;
+      }
+      else {
+        setItem(themeData[0]);
+        localStorage.setItem("theme", themeData[0].value)
+        bodyElement.className = themeData[0].value;
+      }
+    }
     setModelOpen(false);
   }
   const setTheme = (selectedItem) => {
     const bodyElement = document.body;
-    setPrevState(bodyElement.className)
-    bodyElement.className = selectedItem.value;   
+    bodyElement.className = selectedItem.value;
     setItem(selectedItem);
   };
 
@@ -42,7 +63,7 @@ export const ThemeModel = React.memo(({ openModel, setModelOpen }) => {
       secondaryButtonText="Cancel"
       open={openModel}
       onRequestClose={() => cancelTheme()}
-      onRequestSubmit={() => setModelOpen(false)}
+      onRequestSubmit={() => handleTheme()}
     >
 
       <div className="carbon-theme-dropdown">
