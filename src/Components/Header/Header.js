@@ -17,6 +17,7 @@ import '../../sdk/theme/Themes.scss'
 import { ProfileDropdown } from '../ProfileDropdown/ProfileDropdown';
 import Dashboard from '../Dashboard/Dashboard';
 import { Outlet } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 export const CommonHeader = () => {
   return (
     <div >
@@ -32,6 +33,7 @@ const HeaderComponent = ({ isSideNavExpanded, onClickSideNavExpand }) => {
   const [profileDropdown, setProfileDropdown] = useState(false);
   const [open, setOpen] = useState(false);
   const [notificationsData, setNotificationsData] = useState(sampleData);
+  const {t}=useTranslation();
   return (
     <>
       <Header aria-label="IBM Platform Name">
@@ -41,7 +43,7 @@ const HeaderComponent = ({ isSideNavExpanded, onClickSideNavExpand }) => {
           onClick={onClickSideNavExpand}
           isActive={isSideNavExpanded}
         />
-        <HeaderName prefix="IBM">Platform</HeaderName>
+        <HeaderName prefix={t('bynar')}>{t('platform')}</HeaderName>
         <HeaderGlobalBar>
           <HeaderGlobalAction aria-label="Search" onClick={() => { }}>
             <Search20 />

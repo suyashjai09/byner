@@ -97,6 +97,8 @@
     //     background-color: var(--cds-hover-ui, #e5e5e5);
     //     color: var(--cds-text-01, #161616);
     // }
+    
+    
   }
 
   .side-nav-link:hover {
@@ -149,6 +151,8 @@
       a.bx--side-nav__link--current::before {
         background-color: var(--cds-ui-navbar, #f4f4f4) !important;
       }
+
+      
     }
   }
 }

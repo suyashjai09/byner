@@ -13,6 +13,7 @@ const initialState = {
   isLoading: false,
   isValidLogin: false,
   theme:null,
+  lang:null,
 }
 export const AuthContext = createContext(initialState)
 const { Provider, Consumer } = AuthContext;
@@ -43,6 +44,7 @@ export const AuthProvider = ({ children }) => {
         name: null,
         email: null,
         theme:null,
+        lang:null,
       });
     } finally {
       setState({
@@ -111,6 +113,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem("token", token);
         localStorage.setItem("email", email);
         localStorage.setItem("theme",'carbon-theme--white');
+        localStorage.setItem("lang","english");
         const bodyElement = document.body;
         bodyElement.className = localStorage.getItem("theme") ;
         navigate("/dashboard");
@@ -135,6 +138,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
     localStorage.removeItem("email");
     localStorage.removeItem("theme");
+    localStorage.removeItem("lang");
     navigate("/signin");
     setState({
       user: null,

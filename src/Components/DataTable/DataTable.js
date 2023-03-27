@@ -7,23 +7,26 @@ import {
     TableBody,
     TableCell,
 } from 'carbon-components-react';
+import { useTranslation } from 'react-i18next';
 import '../DataTable/DataTable.scss'
 export const DataTables = () => {
+
+    const {t}=useTranslation();
     const rows = [
         {
             id: 'a',
-            name: 'Load balancer 1',
-            status: 'Disabled',
+            name: t('load-balancer1'),
+            status: t('disabled'),
         },
         {
             id: 'b',
-            name: 'Load balancer 2',
-            status: 'Starting',
+            name: t('load-balancer2'),
+            status: t('starting'),
         },
         {
             id: 'c',
-            name: 'Load balancer 3',
-            status: 'Active',
+            name: t('load-balancer3'),
+            status: t('active'),
         },
     ];
 

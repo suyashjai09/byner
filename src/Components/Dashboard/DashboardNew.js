@@ -14,14 +14,27 @@ import { NewsInfoCard } from '../Cards/NewsInfoCard/NewsInfoCard.js';
 import { ViewUsageCard } from '../Cards/ViewUsageCard/ViewUsageCard';
 import { SupportCard } from '../Cards/SupportCard/SupportCard';
 import { TabComponent } from '../Tabs/TabComponent';
+import {useTranslation} from "react-i18next";
 
-const Dashboard = () => {
+const DashboardNew = () => {
+  const {t, i18n} = useTranslation();
   return (
-  <div> 
-      <TabComponent/>
-  </div>
-  
-  );
+  <div className='bynar-dashboard'>
+    <div className='bynar-heading'>
+    <Heading className='heading'>
+        {t('header')}
+    </Heading>
+    <button className='button-dashboard'>
+    {t('create-resource-button')}
+    </button>
+    </div>
+    <div className='container'>
+     <NewsInfoCard/>
+     <ViewUsageCard/>
+     <SupportCard/>
+    </div>
+    
+  </div>);
 }
 
-export default Dashboard;
+export default DashboardNew;

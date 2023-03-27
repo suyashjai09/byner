@@ -158,6 +158,9 @@ body {
   outline-offset: -2px;
   
 }
+button.bx--side-nav__submenu::before {
+  background-color: var(--cds-ui-navbar, #f4f4f4) !important;
+}
 // li.bx--side-nav__item--active{
 //   background: red !important;
 // }

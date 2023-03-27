@@ -3,31 +3,36 @@ import {
   Dropdown,
 } from 'carbon-components-react';
 import React, { useState, useContext, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ThemeContext } from './ThemeContext';
 
 
 export const ThemeModel = React.memo(({ openModel, setModelOpen }) => {
-  const [prevState, setPrevState] = useState(null)
+  const {t,i18n}=useTranslation();
   const themeData = [
     {
-      text: 'White',
+      text: t('white'),
       value: 'carbon-theme--white',
     },
     {
-      text: 'Gray 90',
+      text: t('gray'),
       value: 'carbon-theme--g90',
     }
   ];
+ 
+  
 
-  const [selectedItem, setItem] = useState(localStorage.getItem("theme") ==="carbon-theme--white"?themeData[0]:themeData[1]);
+
+  const [selectedTheme, setItem] = useState(themeData[localStorage.getItem("theme") ==="carbon-theme--white"?0:1]);
+
   const handleTheme = () => {
     const bodyElement = document.body;
-    bodyElement.className = selectedItem.value;
-    if (selectedItem.value === "carbon-theme--g90") {
+    bodyElement.className = selectedTheme.value;
+    if (selectedTheme.value === "carbon-theme--g90") {
       setItem(themeData[1]);
       localStorage.setItem("theme", themeData[1].value)
     }
-    else if (selectedItem.value === "carbon-theme--white") {
+    else if (selectedTheme.value === "carbon-theme--white") {
       setItem(themeData[0]);
       localStorage.setItem("theme", themeData[0].value)
     }
@@ -37,7 +42,7 @@ export const ThemeModel = React.memo(({ openModel, setModelOpen }) => {
   const cancelTheme = () => {
     const bodyElement = document.body;
     const currentTheme = localStorage.getItem("theme");
-    if (selectedItem.value !== currentTheme) {
+    if (selectedTheme.value !== currentTheme) {
       if (currentTheme === "carbon-theme--g90") {
         setItem(themeData[1]);
         localStorage.setItem("theme", themeData[1].value)
@@ -51,16 +56,25 @@ export const ThemeModel = React.memo(({ openModel, setModelOpen }) => {
     }
     setModelOpen(false);
   }
-  const setTheme = (selectedItem) => {
+  const setTheme = (selectedTheme) => {
     const bodyElement = document.body;
-    bodyElement.className = selectedItem.value;
-    setItem(selectedItem);
+    bodyElement.className = selectedTheme.selectedItem.value;
+    setItem(selectedTheme.selectedItem);
   };
 
+  useEffect(()=>{   
+   const index = localStorage.getItem("theme") ==="carbon-theme--white"?0:1;
+   if(themeData[index].text !==selectedTheme.text  && !openModel)
+   {
+    setItem(themeData[index]);
+   }
+  },[themeData])
+
+  
   return (
     <Modal
-      primaryButtonText="Submit"
-      secondaryButtonText="Cancel"
+      primaryButtonText={t('submit')}
+      secondaryButtonText={t('cancel')}
       open={openModel}
       onRequestClose={() => cancelTheme()}
       onRequestSubmit={() => handleTheme()}
@@ -71,11 +85,11 @@ export const ThemeModel = React.memo(({ openModel, setModelOpen }) => {
           ariaLabel="Theme dropdown"
           id="theme-dropdown"
           items={themeData}
+          selectedItem={selectedTheme}
           itemToString={(item) => (item ? item.text : "")}
-          onChange={(event) => setTheme(event.selectedItem)}
-          selectedItem={selectedItem}
-          label="Select a Carbon theme"
-          titleText="Select a Carbon theme"
+          onChange={(event) => setTheme(event)}
+          label={t('select-theme')}
+          titleText={t('select-theme')}
         />
       </div>
     </Modal>

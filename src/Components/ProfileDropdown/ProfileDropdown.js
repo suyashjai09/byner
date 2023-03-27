@@ -13,13 +13,17 @@ import { ThemeModel } from '../../sdk/theme/ThemeModel';
 import { AuthContext } from '../../sdk/context/AuthContext';
 import { UserProfileImage } from '@carbon/ibm-products';
 import { ThemeContext } from '../../sdk/theme/ThemeContext';
+import {useTranslation} from "react-i18next";
+import { LanguageModel } from '../../translation/LanguageModel/LanguageModel';
 
 
 export const ProfileDropdown = ({ open, setOpen }) => {
 
+  const [t, i18n] = useTranslation();
   const authContext = useContext(AuthContext)
   const theme = useContext(ThemeContext);
   const [openModel, setModelOpen] = useState(false);
+  const [openLanguageModel, setLanguageModelOpen] =useState(false);
   const wrapperRef = useRef(null);
   const showProfilePanelRef = useRef(null);
   const setShowProfilePanelRef = useRef(null);
@@ -29,6 +33,9 @@ export const ProfileDropdown = ({ open, setOpen }) => {
   const handleLogout = async (e) => {
     e.preventDefault();
     const logout = await authContext.signout();
+  }
+  const handleLanguageChange =(e)=>{
+    setLanguageModelOpen(!openLanguageModel);
   }
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -60,7 +67,6 @@ export const ProfileDropdown = ({ open, setOpen }) => {
               Evin Lewis
             </h4>
             <div className='profile-info-image' >
-              {/* <UserAvatar20 className='profile-info-image-icon'  /> */}
               <UserProfileImage
                 backgroundColor={'light-cyan'}
                 className="example__user-profile-image"
@@ -72,15 +78,19 @@ export const ProfileDropdown = ({ open, setOpen }) => {
             </div>
           </div>
           <ul style={{ 'marginTop': '1rem' }} >
-            <li className='bynar-profile-settings-item' ><Link>Profile</Link></li>
-            <li className='bynar-profile-settings-item' ><Link>Privacy</Link></li>
-            <li className='bynar-profile-settings-item' ><Link style={{ 'cursor': 'pointer' }} onClick={() => setModelOpen(!openModel)} >Change Theme</Link></li>
-            <li className='bynar-profile-settings-item' ><Link onClick={handleLogout}>Logout</Link></li>
+            <li className='bynar-profile-settings-item' ><Link>{t('profile')}</Link></li>
+            <li className='bynar-profile-settings-item' ><Link>{t('privacy')}</Link></li>
+            <li className='bynar-profile-settings-item' ><Link onClick={ handleLanguageChange}>{t('change-language')}</Link></li>
+            <li className='bynar-profile-settings-item' ><Link style={{ 'cursor': 'pointer' }} onClick={() => setModelOpen(!openModel)} >{t('change-theme')}</Link></li>
+            <li className='bynar-profile-settings-item' ><Link onClick={handleLogout}>{t('logout')}</Link></li>
           </ul>
         </Tile>
       ) : ('')}
       <div>
         <ThemeModel openModel={openModel} setModelOpen={setModelOpen} />
+      </div>
+      <div>
+        <LanguageModel openLanguageModel={openLanguageModel} setLanguageModelOpen={setLanguageModelOpen} />
       </div>
     </div>
   )

@@ -12,8 +12,10 @@ import { useNavigate } from "react-router-dom";
 import './Navbar.scss'
 import { Notification20, UserAvatar20, Switcher20,Search20,
   AppSwitcher20 } from '@carbon/icons-react';
+import { useTranslation } from "react-i18next";
 export const Navbar = ({isSideNavExpanded,onClickSideNavExpand}) => {
   let navigate = useNavigate();
+  const {t}=useTranslation();
   const Fade16 = () => (
     <svg
       width="16"
@@ -33,16 +35,16 @@ export const Navbar = ({isSideNavExpanded,onClickSideNavExpand}) => {
             expanded={isSideNavExpanded} 
             >
               <SideNavItems className="side-nav">
-                <SideNavLink renderIcon={Search20} className="side-nav-link" title="Data Table" onClick={()=>{navigate("/datatable")}}>Data Table</SideNavLink> 
+                <SideNavLink renderIcon={Search20} className="side-nav-link" title="Data Table" onClick={()=>{navigate("/datatable")}}>{t('data-table')}</SideNavLink> 
                 {/* <SideNavLink renderIcon={Fade16} title="Side Panel" onClick={()=>{navigate("/sidepanel")}}>Side Panel</SideNavLink> 
                 <SideNavLink renderIcon={Fade16} title="Tear Sheet" onClick={()=>{navigate("/tearsheet")}}>TearSheet</SideNavLink> */}
                  
-                 <SideNavMenu renderIcon={Fade16} title="Category title" className="side-nav-menu">
+                 <SideNavMenu renderIcon={Fade16} title={t('category')} className="side-nav-menu">
                   <SideNavMenuItem
                     aria-current="page"
                     className="side-nav-menu-item"
                   >
-                    Link1
+                    {t('link')}
                   </SideNavMenuItem>
                 </SideNavMenu>
               </SideNavItems>

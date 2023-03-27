@@ -1,4 +1,5 @@
 import { CommonHeader } from './Components/Header/Header';
+import React, {Suspense} from 'react';
 import { Routes, Route, BrowserRouter } from 'react-router-dom';
 import './index.scss'
 import { DataTables } from './Components/DataTable/DataTable';
@@ -10,10 +11,11 @@ import Signin from './pages/signin/signin';
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import { AuthProvider } from './sdk/context/AuthContext';
 
+
 function App() {
   return (
     <div className="app">
-      
+    <Suspense fallback="loading">
       <BrowserRouter>
       <AuthProvider>
         <Routes>
@@ -29,7 +31,7 @@ function App() {
         </Routes>
         </AuthProvider>
       </BrowserRouter>
-      
+      </Suspense>
     </div>
   );
 }
