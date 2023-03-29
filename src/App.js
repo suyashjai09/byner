@@ -10,6 +10,8 @@ import Signup from './pages/signup/signup';
 import Signin from './pages/signin/signin';
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import { AuthProvider } from './sdk/context/AuthContext';
+import { UserList } from './pages/UserList/UserList';
+import { AddUser } from './pages/AddUser/AddUser';
 
 
 function App() {
@@ -23,11 +25,13 @@ function App() {
           <Route path='/' element={<CommonHeader />}>
             <Route exact path="/dashboard" element={<Dashboard />} />    {/*A nested route!*/}
             <Route exact path="/datatable" element={<DataTables />} />
+            <Route exact path="/userlist" element={<UserList />} /> 
             {/* <Route exact path="/sidepanel" element={<SidePanels />} />
             <Route exact path="/tearsheet" element={<TearSheets />} />  */}
           </Route>
           <Route exact path="/signin" element={<Signin />} /> 
           <Route exact path="/forgotpassword" element={<ForgotPassword />} /> 
+          <Route exact path="/adduser" element={<AddUser/>} /> 
         </Routes>
         </AuthProvider>
       </BrowserRouter>

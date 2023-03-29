@@ -6,7 +6,6 @@ const initialState = {
     Promise.resolve(null),
   signout: () => Promise.resolve(null),
   user: null,
-  email: null,
   token: null,
   isLoggedIn: false,
   error: null,
@@ -29,12 +28,10 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     try {
       const token = localStorage.getItem("token");
-      const email = localStorage.getItem("email");
       if (token) {
         setState({
           token,
           isLoggedIn: true,
-          email,
         });
       }
     } catch (e) {
@@ -42,7 +39,6 @@ export const AuthProvider = ({ children }) => {
         token: null,
         isLoggedIn: false,
         name: null,
-        email: null,
         theme:null,
         lang:null,
       });
@@ -72,46 +68,36 @@ export const AuthProvider = ({ children }) => {
     try {
       setState({ isLoading: true, isValidLogin: false });
       let endPoint = "";
+      let token="";
+      let message="";
       if (isMfa) {
         endPoint = "mfa";
       }
       else {
         endPoint = "login";
       }
-      //  const response = await fetch(`${BaseURL}/${endPoint}`, {
-      //                 method: 'POST',
-      //                 body: JSON.stringify(data),
-      //                 headers: {
-      //                     'Content-Type': 'application/json',
-      //                 },
-      //             })
-      //   if(response.ok){
-
-      //   }
-      const { token, name, email } = { token: "1235", name: "suyash", email: "xyz" };
-      // const { token, name, email } = await fetch(
-      //   `${BaseURL}/${endPoint}`,
-      //   {
-      //     method: "POST",
-      //     body: JSON.stringify(data),
-      //     headers: {
-      //       "Content-type": "application/json; charset=UTF-8",
-      //     },
-      //   }
-      // ).then((res) => {
-      //   // const data = { token: "1235", name: "suyash", email: "xyz" }
-      //   const apiData=res.json()
-      //    return apiData
-      // }) 
+      const response = await fetch(`${BaseURL}/${endPoint}`, {
+                      method: 'POST',
+                      body: JSON.stringify(data),
+                      headers: {
+                          'Content-Type': 'application/json',
+                      },
+                  })
+      const res = await response.json();
+      if(response.ok){
+        token = res.Token;
+        message = res.message;
+      }
+      else{
+        return res; 
+      }
       if (token) {
         setState({
           isLoggedIn: true,
           token,
-          error: null,
-          email,
+          error: null
         });
         localStorage.setItem("token", token);
-        localStorage.setItem("email", email);
         localStorage.setItem("theme",'carbon-theme--white');
         localStorage.setItem("lang","english");
         const bodyElement = document.body;
@@ -122,13 +108,13 @@ export const AuthProvider = ({ children }) => {
         setState({
           inValidLogin: true,
           isLoggedIn: false,
-          token: null,
-          email: null,
+          token: null
         });
-
+        return res;
       }
     } catch (e) {
       setState({ error: "Error logging in" });
+      return { error: "Error logging in" }
     } finally {
       setState({ isLoading: false });
     }
@@ -136,15 +122,13 @@ export const AuthProvider = ({ children }) => {
 
   const signout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("email");
     localStorage.removeItem("theme");
     localStorage.removeItem("lang");
     navigate("/signin");
     setState({
       user: null,
       token: null,
-      isLoggedIn: false,
-      email: null,
+      isLoggedIn: false
     });
   };
 

@@ -13,55 +13,36 @@ import { ThemeModel } from '../../sdk/theme/ThemeModel';
 import { AuthContext } from '../../sdk/context/AuthContext';
 import { UserProfileImage } from '@carbon/ibm-products';
 import { ThemeContext } from '../../sdk/theme/ThemeContext';
-import {useTranslation} from "react-i18next";
+import { useTranslation } from "react-i18next";
 import { LanguageModel } from '../../translation/LanguageModel/LanguageModel';
 
 
-export const ProfileDropdown = ({ open, setOpen }) => {
+const ProfileDropdown = React.memo(() => {
 
   const [t, i18n] = useTranslation();
   const authContext = useContext(AuthContext)
   const theme = useContext(ThemeContext);
   const [openModel, setModelOpen] = useState(false);
-  const [openLanguageModel, setLanguageModelOpen] =useState(false);
-  const wrapperRef = useRef(null);
-  const showProfilePanelRef = useRef(null);
-  const setShowProfilePanelRef = useRef(null);
-  showProfilePanelRef.current = open;
-  setShowProfilePanelRef.current = setOpen;
-
+  const [openLanguageModel, setLanguageModelOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(true);
   const handleLogout = async (e) => {
     e.preventDefault();
     const logout = await authContext.signout();
   }
-  const handleLanguageChange =(e)=>{
+  const handleLanguageChange = (e) => {
+    e.preventDefault();
     setLanguageModelOpen(!openLanguageModel);
   }
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-        if (showProfilePanelRef.current) {
-          setShowProfilePanelRef.current(false);
-        }
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [wrapperRef]);
+
+  const handleThemeChange = (e) => {
+    e.preventDefault();
+    setModelOpen(!openModel)
+  }
 
   return (
-    <div ref={wrapperRef}>
-      <UserAvatar20
-        type="button"
-        onClick={() => {
-          setOpen(!open);
-        }}>
-
-      </UserAvatar20>
-      {open ? (
-        <Tile className="bynar-profile-settings-panel" >
+    <div>
+      {profileDropdownOpen ?
+        (<Tile  style={{marginTop:"3px"}} className="bynar-profile-settings-panel" >
           <div className='bynar-profile-info-wrapper' >
             <h4 style={{ 'width': '20rem', 'margin': 'auto' }} >
               Evin Lewis
@@ -73,19 +54,18 @@ export const ProfileDropdown = ({ open, setOpen }) => {
                 size={'xlg'}
                 initials={"Evin Lewis"}
                 tooltipText={"Evin Lewis"}
-                theme={theme?.state?.currentTheme?.value === 'carbon-theme--g90'?'dark':'light'}
+                theme={theme?.state?.currentTheme?.value === 'carbon-theme--g90' ? 'dark' : 'light'}
               />
             </div>
           </div>
           <ul style={{ 'marginTop': '1rem' }} >
             <li className='bynar-profile-settings-item' ><Link>{t('profile')}</Link></li>
             <li className='bynar-profile-settings-item' ><Link>{t('privacy')}</Link></li>
-            <li className='bynar-profile-settings-item' ><Link onClick={ handleLanguageChange}>{t('change-language')}</Link></li>
-            <li className='bynar-profile-settings-item' ><Link style={{ 'cursor': 'pointer' }} onClick={() => setModelOpen(!openModel)} >{t('change-theme')}</Link></li>
-            <li className='bynar-profile-settings-item' ><Link onClick={handleLogout}>{t('logout')}</Link></li>
+            <li className='bynar-profile-settings-item' ><Link style={{ 'cursor': 'pointer' }} onClick={handleLanguageChange}>{t('change-language')}</Link></li>
+            <li className='bynar-profile-settings-item' ><Link style={{ 'cursor': 'pointer' }} onClick={handleThemeChange} >{t('change-theme')}</Link></li>
+            <li className='bynar-profile-settings-item' ><Link style={{ 'cursor': 'pointer' }} onClick={handleLogout}>{t('logout')}</Link></li>
           </ul>
-        </Tile>
-      ) : ('')}
+        </Tile>) : ("")}
       <div>
         <ThemeModel openModel={openModel} setModelOpen={setModelOpen} />
       </div>
@@ -94,4 +74,5 @@ export const ProfileDropdown = ({ open, setOpen }) => {
       </div>
     </div>
   )
-}
+})
+export default ProfileDropdown;

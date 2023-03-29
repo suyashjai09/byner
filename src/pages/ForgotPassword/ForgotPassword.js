@@ -1,4 +1,4 @@
-import React, { useState, useRef, useContext } from 'react';
+import React, { useState, useRef, useContext, useLayoutEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -15,16 +15,24 @@ import {
 import './ForgotPassword.scss'
 import { Loader } from '../../Components/Loader/Loader';
 import { BaseURL } from '../../sdk/constant';
+import { PasswordStrength } from '../../Components/PasswordStrength/PasswordStrength';
+import { ForgotPasswordStrengthChecker } from './ForgotPasswordStrengthChecker';
 
 const ForgotPassword = () => {
     let navigate = useNavigate();
     const [askForPassword, setAskForPassword] = useState(true);
     const [loading, setLoading] = useState(false);
     const [errorNotification, setErrorNotification] = useState({});
+    const [passwordErrorNotification, setPasswordErrorNotification] = useState({});
     const [serverErrorNotification, setServerErrorNotification] = useState({});
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [verificationCode, setVerificationCode] = useState("");
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const [passwordArray, setPasswordArray] = useState(Array(6).fill(false))
+    const [passwordStrengthWidth, setpaswordStrengthWidth] = useState(0);
+    const [passwordIsValid, setPasswordIsValid] = useState(false);
+    const ref = useRef(null);
     const emailInput = useRef(null);
     const validateEmail = (email) => {
         return String(email)
@@ -33,22 +41,83 @@ const ForgotPassword = () => {
                 /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
             );
     };
+
+    useLayoutEffect(() => {
+        // setWidth(ref?.current?.offsetWidth);
+        handlePasswordStrengthLength(password);
+    }, [isPasswordVisible]);
+
+    const handlePasswordStrengthLength = (value) => {
+        const lengthRegex = /^.{8,}$/;
+        const uppercaseRegex = /[A-Z]/;
+        const lowercaseRegex = /[a-z]/;
+        const numberRegex = /[0-9]/;
+        const specialcharacterRegex = /[-!$%^&*()_+|~=`{}\[\]:\/;<>?,.@#]/;
+        const tempArray = [lengthRegex.test(value.trim()), uppercaseRegex.test(value), lowercaseRegex.test(value), numberRegex.test(value), specialcharacterRegex.test(value), value.length == value.trim().length];
+        setpaswordStrengthWidth(tempArray.filter(i => i === true).length * ref?.current?.offsetWidth / 6);
+    }
+
+    const handlePasswordChange = (value) => {
+        setErrorNotification({});
+        setPassword(value);
+        const lengthRegex = /^.{8,}$/;
+        const uppercaseRegex = /[A-Z]/;
+        const lowercaseRegex = /[a-z]/;
+        const numberRegex = /[0-9]/;
+        const specialcharacterRegex = /[-!$%^&*()_+|~=`{}\[\]:\/;<>?,.@#]/;
+        const tempArray = [lengthRegex.test(value.trim()), uppercaseRegex.test(value), lowercaseRegex.test(value), numberRegex.test(value), specialcharacterRegex.test(value), value.length == value.trim().length];
+        setPasswordArray(tempArray)
+        setpaswordStrengthWidth(tempArray.filter(i => i === true).length * ref?.current?.offsetWidth / 6);
+        setPasswordIsValid(lengthRegex.test(value.trim()) && uppercaseRegex.test(value) && lowercaseRegex.test(value) && numberRegex.test(value) && specialcharacterRegex.test(value))
+    };
+
     const handleEmailFormSubmit = (e) => {
         e.preventDefault();
+        setLoading(true);
         if (email.length == 0) {
             setErrorNotification({
                 title: "Email should not be blank"
             });
+            setLoading(false);
         }
         else if (!validateEmail(email)) {
             setErrorNotification({
                 title: "Enter valid email"
             });
+            setLoading(false);
         }
         else {
+            setLoading(true);
             setErrorNotification({
             })
-            setAskForPassword(false);
+            const fetchData = async () => {
+                try {
+                    const data = {
+                        email: email,
+                    }
+                    const response = await fetch(`${BaseURL}/forgot-password`, {
+                        method: 'POST',
+                        body: JSON.stringify(data),
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    })
+                    if (response.ok) {
+                        setAskForPassword(false);
+                    }
+                    else if (response.status === 500) {
+                        setServerErrorNotification({
+                            title: "Email not registered"
+                        })
+                    }
+                    setLoading(false);
+                }
+                catch (e) {
+                    setLoading(false);
+                }
+            }
+            fetchData();
+
         }
     }
 
@@ -56,18 +125,12 @@ const ForgotPassword = () => {
         e.preventDefault();
         setLoading(true);
         if (verificationCode.length == 0 || password.length == 0) {
-            // if(verificationCode.length == 0)
-            // setErrorNotification({
-            //     title: "verification code should  not be blank"
-            // });
-            // else if(password.length == 0){
-            //     setErrorNotification({
-            //         title: "password should  not be blank"
-            //     });   
-            // } 
             setErrorNotification({
                 title: "field should  not be blank"
             });
+            setLoading(false);
+        }
+        else if (!passwordIsValid) {
             setLoading(false);
         }
         else {
@@ -79,7 +142,7 @@ const ForgotPassword = () => {
                         newPassword: password,
                         code: verificationCode,
                     }
-                    const response = await fetch(`${BaseURL}/confirm-forgot-password`, {
+                    const response = await fetch(`${BaseURL}/confirm-forget-password`, {
                         method: 'POST',
                         body: JSON.stringify(data),
                         headers: {
@@ -143,12 +206,16 @@ const ForgotPassword = () => {
                                 </div>
                             </div>
                             <div className='fields-container'>
-                                <Button
-                                    type="submit"
-                                    iconDescription={''}
-                                    size="xl"
-                                    className="submit-button"
-                                >{"Continue"}</Button>
+                                {loading ?
+                                    (<div className='forgot-password-loader-signin'>
+                                        <Loader />
+                                    </div>) : (
+                                        <Button
+                                            type="submit"
+                                            iconDescription={''}
+                                            size="xl"
+                                            className="submit-button"
+                                        >{"Continue"}</Button>)}
                             </div>
 
                         </Form>
@@ -174,18 +241,29 @@ const ForgotPassword = () => {
                                                 value={verificationCode}
                                                 onChange={e => { setVerificationCode(e.target.value); if (typeof errorNotification == 'object' && Object.keys(errorNotification).length !== 0) setErrorNotification({}); }}
                                             />
-                                            <PasswordInput
+                                            <PasswordInput ref={ref}
                                                 type="password"
                                                 className="login-form-input"
                                                 id="password"
                                                 labelText="Enter Password"
-                                                invalid={typeof errorNotification == 'object' && Object.keys(errorNotification).length !== 0 && password.length == 0}
-                                                invalidText={(errorNotification && errorNotification.title && password.length == 0) ? errorNotification.title : ""}
+                                                invalid={!passwordIsValid && password.length > 0}
+                                                invalidText={
+                                                    !passwordIsValid && password.length > 0
+                                                        ? 'Aleast 8 characters are required including uppercase, lowercase and a number.'
+                                                        : null
+                                                }
                                                 placeholder=""
                                                 disabled={loading ? true : false}
                                                 value={password}
-                                                onChange={e => setPassword(e.target.value)}
+                                                onChange={(e) => handlePasswordChange(e.target.value)}
+                                                onFocus={() => { setIsPasswordVisible(true) }}
+                                                onBlur={() => { setIsPasswordVisible(false) }}
                                             />
+                                            {isPasswordVisible && <div style={{ width: `${passwordStrengthWidth}px`, height: '4px', backgroundColor: 'green', marginTop: '2px' }}></div>}
+                                            <div style={{ position: "absolute" }}>
+                                                {isPasswordVisible && <ForgotPasswordStrengthChecker passwordArray={passwordArray} />}
+                                            </div>
+
                                         </div>
                                     </div>
                                     <div className='fields-container'>

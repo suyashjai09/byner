@@ -1,4 +1,4 @@
-import React, { useState, useEffect ,useContext} from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -6,7 +6,8 @@ import {
     Button,
     Heading,
 } from '@carbon/react';
-import { TextInput
+import {
+    TextInput
 } from 'carbon-components-react';
 import './MultiFactorAuthentication.scss'
 import { AuthContext } from '../../sdk/context/AuthContext';
@@ -24,30 +25,30 @@ export const MultiFactorAuthentication = ({ email, errorNotification, loading, s
             setErrorNotification({
                 title: "verification code should  not be blank"
             });
+           
         }
         else {
             setErrorNotification({
             })
             const fetchData = async () => {
-                const data = {
-                    email: email,
-                    verificationCode: verificationCode
-                }
-                const response = await authContext.signin(data,true);
-                // const response = await fetch(`${BaseURL}/login`, {
-                //     method: 'POST',
-                //     body: JSON.stringify(data),
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //     },
-                // })
+                try {
+                    const data = {
+                        email: email,
+                        verificationCode: verificationCode
+                    }
+                    const response = await authContext.signin(data, true);
+                    
 
-                // setTimeout(() => {
-                //     setLoading(true);
-                // }, 2000);
+                   
+                    setLoading(false);
+                }
+                catch (e) {
+                    setLoading(false);
+                }
             }
             fetchData();
         }
+        
 
     }
     return (
@@ -72,16 +73,16 @@ export const MultiFactorAuthentication = ({ email, errorNotification, loading, s
                         </div>
                     </div>
                     <div className='fields-container'>
-                    {loading ?
-                                            (<div className='forgot-password-loader-signin'>
-                                                <Loader />
-                                            </div>) :
-                                            (<Button
-                                                type="submit"
-                                                // iconDescription={submitText}
-                                                size="xl"
-                                                className="submit-button"
-                                            >Login</Button>)}
+                        {loading ?
+                            (<div className='forgot-password-loader-signin'>
+                                <Loader />
+                            </div>) :
+                            (<Button
+                                type="submit"
+                                // iconDescription={submitText}
+                                size="xl"
+                                className="submit-button"
+                            >Login</Button>)}
                         {/* <Button
                             type="submit"
                             // iconDescription={submitText}

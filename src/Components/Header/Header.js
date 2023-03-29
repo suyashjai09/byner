@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Header,
   HeaderMenuButton,
@@ -8,16 +8,16 @@ import {
 } from 'carbon-components-react';
 import HeaderContainer from "carbon-components-react/lib/components/UIShell/HeaderContainer";
 import {
-  Notification20,Search20
+  Notification20, Search20, UserAvatar20
 } from '@carbon/icons-react';
 import { Navbar } from '../Navbar/Navbar';
 import { NotificationPanel } from '../NotificationPanel/NotificationPanel';
 import { sampleData } from '../NotificationPanel/NotificationData';
 import '../../sdk/theme/Themes.scss'
-import { ProfileDropdown } from '../ProfileDropdown/ProfileDropdown';
 import Dashboard from '../Dashboard/Dashboard';
 import { Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import ProfileDropdown from '../ProfileDropdown/ProfileDropdown';
 export const CommonHeader = () => {
   return (
     <div >
@@ -33,7 +33,38 @@ const HeaderComponent = ({ isSideNavExpanded, onClickSideNavExpand }) => {
   const [profileDropdown, setProfileDropdown] = useState(false);
   const [open, setOpen] = useState(false);
   const [notificationsData, setNotificationsData] = useState(sampleData);
-  const {t}=useTranslation();
+
+  const wrapperRef = useRef(null);
+  const showProfilePanelRef = useRef(null);
+  const setShowProfilePanelRef = useRef(null);
+  showProfilePanelRef.current = profileDropdown;
+  setShowProfilePanelRef.current = setProfileDropdown;
+  const { t } = useTranslation();
+
+  const handleDropDown = (e) => {
+    e.preventDefault();
+    setProfileDropdown((profileDropdown) => !profileDropdown);
+  }
+
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+        if (showProfilePanelRef.current) {
+          setShowProfilePanelRef.current(false);
+          console.log("check")
+        }
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+
+  }, [wrapperRef]);
+
+
   return (
     <>
       <Header aria-label="IBM Platform Name">
@@ -51,63 +82,16 @@ const HeaderComponent = ({ isSideNavExpanded, onClickSideNavExpand }) => {
           <HeaderGlobalAction aria-label="Notifications" onClick={() => setOpen(!open)}>
             <Notification20 />
           </HeaderGlobalAction>
-          <HeaderGlobalAction aria-label="User" >
-            <ProfileDropdown open={profileDropdown} setOpen={setProfileDropdown} />
-          </HeaderGlobalAction>
+          <div ref={wrapperRef}>
+            <>
+              <HeaderGlobalAction aria-label="User" onClick={handleDropDown}>
+                <UserAvatar20 />
+              </HeaderGlobalAction>
+              {profileDropdown && <ProfileDropdown/>}
+            </>
+          </div>
         </HeaderGlobalBar>
         <Navbar isSideNavExpanded={isSideNavExpanded} onClickSideNavExpand={onClickSideNavExpand} />
-        {/* <SideNav aria-label="Side navigation"
-          isPersistent={false}
-          expanded={isSideNavExpanded}
-        >
-          <SideNavItems>
-            <SideNavMenu renderIcon={Search20} title="Category title">
-              <SideNavMenuItem
-                aria-current="page"
-                href="javascript:void(0)"
-              >
-
-                Link
-              </SideNavMenuItem>
-              <SideNavMenuItem href="javascript:void(0)">
-                Link
-              </SideNavMenuItem>
-            </SideNavMenu>
-            <SideNavMenu renderIcon={Fade16} title="Category title1">
-              <SideNavMenuItem
-                aria-current="page"
-                href="javascript:void(0)"
-              >
-                Link
-              </SideNavMenuItem>
-              <SideNavMenuItem href="javascript:void(0)">
-                Link
-              </SideNavMenuItem>
-            </SideNavMenu>
-            <SideNavMenu renderIcon={Fade16} title="Category title2">
-              <SideNavMenuItem
-                aria-current="page"
-                href="javascript:void(0)"
-              >
-                Link
-              </SideNavMenuItem>
-              <SideNavMenuItem href="javascript:void(0)">
-                Link
-              </SideNavMenuItem>
-            </SideNavMenu>
-            <SideNavMenu renderIcon={Fade16} title="Category title3">
-              <SideNavMenuItem
-                aria-current="page"
-                href="javascript:void(0)"
-              >
-                Link
-              </SideNavMenuItem>
-              <SideNavMenuItem href="javascript:void(0)">
-                Link
-              </SideNavMenuItem>
-            </SideNavMenu>
-          </SideNavItems>
-        </SideNav> */}
       </Header>
       <Outlet />
 

@@ -9,7 +9,7 @@ import {
   Tab
 } from '@carbon/react';
 import {Close } from '@carbon/react/icons'
-import DashboardNew from '../Dashboard/DashboardNew';
+import DashboardContainer from '../Dashboard/DashboardContainer';
 import './Tabs.scss'
 import { useTranslation } from 'react-i18next';
 
@@ -22,7 +22,7 @@ export const TabComponent=()=>{
    const [data,setData] =useState(
     [
       {
-        component: <DashboardNew/>,
+        component: <DashboardContainer/>,
         id: 1,
         isDelted:false,
       }

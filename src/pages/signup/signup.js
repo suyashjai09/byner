@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect ,useLayoutEffect,useRef} from 'react';
 import 'react-telephone-input/css/default.css'
 import {
     formatCreditCardNumber,
@@ -68,8 +68,11 @@ const Signup = () => {
     const [isAccountInfoError, setIsAccountInfoError] = useState(false);
     const [isVerifyEmailInfoError, setIsVerifyEmailError] = useState(false);
     const [isCreateAccountError, setIsCreateAccountError] = useState(false);
-    const [userId, setUserId] = useState('');
-    const [message, setMessage] = useState('creting account ...');
+    const [userId, setUserId] = useState();
+    const [message, setMessage] = useState('creating account ...');
+    const ref = useRef(null);
+
+  const [width, setWidth] = useState(0);
     const accountInfoButtonDisabled = !passwordIsValid || !emailIsValid || email.length == 0 || password.length == 0 || isAccountInfoError;
     const personalInfoButtonDisabled = firstName.length == 0 || lastName.length == 0 || city.length == 0 || state.length == 0 || postalCode.length == 0 || phoneNumber.length == 0 || addressLine1.length == 0;
     const verificationEmailButtonDisabled = verificationCode.length == 0 || isVerifyEmailInfoError;
@@ -86,6 +89,20 @@ const Signup = () => {
         setIsVerifyEmailError(false);
     }
 
+    useLayoutEffect(() => {
+        // setWidth(ref?.current?.offsetWidth);
+        handlePasswordStrengthLength(password);
+      }, [isPasswordVisible]);
+
+    const handlePasswordStrengthLength=(value)=>{
+        const lengthRegex = /^.{8,}$/;
+        const uppercaseRegex = /[A-Z]/;
+        const lowercaseRegex = /[a-z]/;
+        const numberRegex = /[0-9]/;
+        const specialcharacterRegex = /[-!$%^&*()_+|~=`{}\[\]:\/;<>?,.@#]/;
+        const tempArray = [lengthRegex.test(value.trim()), uppercaseRegex.test(value), lowercaseRegex.test(value), numberRegex.test(value), specialcharacterRegex.test(value), value.length == value.trim().length];
+        setpaswordStrengthWidth(tempArray.filter(i => i === true).length * ref?.current?.offsetWidth/6);
+    }
     const checkEmailValid = (value) => {
         var isEmailValid =
             /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
@@ -123,7 +140,8 @@ const Signup = () => {
         const specialcharacterRegex = /[-!$%^&*()_+|~=`{}\[\]:\/;<>?,.@#]/;
         const tempArray = [lengthRegex.test(value.trim()), uppercaseRegex.test(value), lowercaseRegex.test(value), numberRegex.test(value), specialcharacterRegex.test(value), value.length == value.trim().length];
         setPasswordArray(tempArray)
-        setpaswordStrengthWidth(tempArray.filter(i => i === true).length * 61);
+        console.log(ref?.current?.offsetWidth)
+        setpaswordStrengthWidth(tempArray.filter(i => i === true).length * ref?.current?.offsetWidth/6);
         setPasswordIsValid(lengthRegex.test(value.trim()) && uppercaseRegex.test(value) && lowercaseRegex.test(value) && numberRegex.test(value) && specialcharacterRegex.test(value))
     };
 
@@ -144,12 +162,9 @@ const Signup = () => {
                         'Content-Type': 'application/json',
                     },
                 })
+                
+                const res = await response.json();
 
-                // const response = {
-                //     ok: true,
-                //     status: 200,
-                //     error: 'email exist',
-                // }
                 if (response.ok) {
                     setActiveStep(2);
                     setIsAccountInfoUpdated(true);
@@ -161,13 +176,14 @@ const Signup = () => {
                     setIsAccountInfoError(true);
                     setActiveStep(1);
                     setErrorNotification({
-                        title: response.error
+                        title: res.error
                     })
                 }
                 setLoading(false);
             }
             catch (e) {
                 setLoading(false)
+                setActiveStep(2)
             }
 
         }
@@ -187,56 +203,37 @@ const Signup = () => {
                     email: email,
                     code: verificationCode,
                 }
-                // const response = await fetch(`${BaseURL}/confirm-email`, {
-                //     method: 'POST',
-                //     body: JSON.stringify(data),
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //     },
-                // })
-                const response = {
-                    ok: true,
-                    status: 500,
-                    error: 'invalid verification code ',
-                }
+                const response = await fetch(`${BaseURL}/confirm-email`, {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
+                const res = await response.json();
                 if (response.ok) {
                     setActiveStep(3);
                     setIsError(false)
                     setIsVerifyEmailError(false);
+                    // const res=JSON.parse(response);
+                    setUserId(res?.accountID);
+                    console.log(res?.accountID,"id")
                 }
                 else if (response.status === 500) {
                     setIsError(true)
                     setIsVerifyEmailError(true);
                     setActiveStep(1);
                     setErrorNotification({
-                        title: response.error
+                        title: "Enter valid confirmation email code"
                     })
                 }
                 setLoading(false);
 
-                // if (true) {
-                //     setTimeout(() => {
-                //         setLoading(false);
-
-                //         setErrorNotification({
-                //             title: "Enter Valid Verification code.Try again"
-                //         });
-                //         setIsError(true)
-                //         setIsVerifyEmailError(true);
-                //         setActiveStep(2);
-                //     }, 2000);
-
-
-                // }
-                // else {
-                //     setActiveStep(1);
-                //     setIsAccountInfoUpdated(true);
-                // }
-                // setActiveStep(3);
-                // return response
+                
             }
             catch (e) {
                 setLoading(false);
+                
             }
         }
         // setActiveStep(3);
@@ -246,7 +243,7 @@ const Signup = () => {
     const handleCreateAccount = () => {
         const fetchData = async () => {
             try {
-                setLoading(true);
+                setLoadingSuccess(true);
                 const data = {
                     id: userId,
                     username: email,
@@ -255,7 +252,7 @@ const Signup = () => {
                     addressLine: addressLine1,
                     addressLine2: addressLine2,
                     city: city,
-                    postalCode: postalCode,
+                    postalCode: parseInt(postalCode),
                     state: state,
                     phoneNumber: phoneNumber,
                     organizationName: organizationName,
@@ -271,31 +268,33 @@ const Signup = () => {
                     },
                 })
 
-                // if(true){
-                //     setErrorNotification({
-                //         title: "Enter Valid Verification code.Try again"
-                //     });
-                //     setIsError(true)
-                //     setIsVerifyEmailError(true);
-                //     setActiveStep(1);
+                if (response.ok) {
+                    setMessage("account created ... moving to signin page")
+                    setTimeout(() => {
 
-                // }
-                // else {
-                //     setActiveStep(1);
-                //     setIsAccountInfoUpdated(true);
-                // }
-                // setActiveStep(3);
-                setLoading(false);
+                        setLoadingSuccess(false);
+                        navigate('/signin');
+                    }, [4000])
+                }
+                else if (response.status === 500) {
+                    setIsError(true)
+                    // setIsVerifyEmailError(true);
+                    // setActiveStep(1);
+                    setErrorNotification({
+                        title: response.error
+                    })
+                }
+                setLoadingSuccess(false);
 
             }
             catch (e) {
-                setMessage("account created ... moving to signin page")
-                setTimeout(() => {
+                // setMessage("account created ... moving to signin page")
+                // setTimeout(() => {
 
-                    setLoading(false);
-                    navigate('/signin');
-                }, [4000])
-                //setLoading(false);
+                //     setLoading(false);
+                //     navigate('/signin');
+                // }, [4000])
+                setLoadingSuccess(false);
             }
 
         }
@@ -311,7 +310,7 @@ const Signup = () => {
         setVatNumber(value);
         const gstRegex = /[0-9]{2}[A-Z]{3}[ABCFGHLJPTF]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}/;
         setGstValid(gstRegex.test(value))
-        console.log('test', gstRegex.test(value))
+      
     }
 
     const handleTaxInfo = () => {
@@ -337,16 +336,16 @@ const Signup = () => {
 
     const creditCardButtonDisabled = cardCVV.length == 0 || cardExpiryDate.length == 0 || cardNumber.length == 0;
     const taxInfoButtonDisabled = organizationName.length == 0 || organizationCountry.length == 0 || (!isGstValid || vatNumber.length === 0);
-    console.log(organizationName.length == 0, organizationCountry.length == 0, !isGstValid, vatNumber.length > 0, "tex valid");
+    // console.log(organizationName.length == 0, organizationCountry.length == 0, !isGstValid, vatNumber.length > 0, "tex valid");
     useEffect(() => {
         // 👇️ scroll to top on page load
-        console.log(errorNotification, 'check', isError)
+        // console.log(errorNotification, 'check', isError)
         if (isError) {
             document.getElementById("scroller").scroll(0, 0);
         }
     }, [isError]);
 
-    console.log(accountInfoButtonDisabled, verificationEmailButtonDisabled, personalInfoButtonDisabled, taxInfoButtonDisabled, creditCardButtonDisabled, 'ischeck', !isChecked, 'crete')
+    // console.log(accountInfoButtonDisabled, verificationEmailButtonDisabled, personalInfoButtonDisabled, taxInfoButtonDisabled, creditCardButtonDisabled, 'ischeck', !isChecked, 'crete')
     return (
 
         <div id="scroller" style={{ overflow: 'auto', backgroundColor: '#000' }}>
@@ -385,23 +384,23 @@ const Signup = () => {
                                     ? 'Enter valid email address' : null
                             }
                         />
-                        <PasswordInput type="password" className='password-text-input'
+                        <PasswordInput ref={ref} type="password" className='password-text-input'
                             id="password-input"
                             labelText="Enter Password"
                             value={password}
                             onChange={(e) => handlePasswordChange(e.target.value)}
-                            onFocus={() => { setIsPasswordVisible(true) }}
-                            onBlur={() => { setIsPasswordVisible(false) }}
+                            onFocus={() => { setIsPasswordVisible(true);setWidth(ref?.current?.offsetWidth) }}
+                            onBlur={() => { setIsPasswordVisible(false); setWidth(ref?.current?.offsetWidth)}}
 
                             invalid={!passwordIsValid && password.length > 0}
                             invalidText={
                                 !passwordIsValid && password.length > 0
-                                    ? 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number.'
+                                    ? 'Aleast 8 characters are required including uppercase, lowercase and a number.'
                                     : null
                             }
                         />
                         {isPasswordVisible && <div style={{ width: `${passwordStrengthWidth}px`, height: '4px', backgroundColor: 'green', marginTop: '2px' }}></div>}
-                        {isPasswordVisible && <PasswordStrength passwordArray={passwordArray} />}
+                        {isPasswordVisible &&  <PasswordStrength passwordArray={passwordArray} />}
 
                         {loading ?
                             (
@@ -691,7 +690,7 @@ const Signup = () => {
                             Create Account
                         </button>
                     </div> */}
-                {loading ?
+                {loadingSuccess ?
                     (
                         <div className='create-account-loader'>
                             <Loader />

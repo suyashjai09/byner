@@ -17,6 +17,7 @@
     "react-credit-card": "^0.20.0",
     "react-dom": "^17",
     "react-i18next": "^12.2.0",
+    "react-jwt": "^1.1.8",
     "react-phone-input-2": "^2.15.1",
     "react-router-dom": "^6.9.0",
     "react-scripts": "^5",

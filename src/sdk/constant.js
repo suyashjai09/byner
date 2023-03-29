@@ -1,1 +1,1 @@
-export const BaseURL="https://w5i6csz6w9.execute-api.eu-central-1.amazonaws.com/Stage";
+export const BaseURL="https://lc7p1jn3j0.execute-api.eu-central-1.amazonaws.com/awscodGetEvFeHM5ZAhd09N";

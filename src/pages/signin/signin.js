@@ -1,4 +1,4 @@
-import React, { useState, useRef ,useContext} from 'react';
+import React, { useState, useRef, useContext } from 'react';
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -11,7 +11,7 @@ import {
     InlineNotification,
 } from '@carbon/react';
 import {
-PasswordInput, TextInput
+    PasswordInput, TextInput
 } from 'carbon-components-react';
 import './signin.scss'
 import { MultiFactorAuthentication } from '../../Components/MultiFactorAuthentication/MultiFactorAuthentication';
@@ -48,8 +48,7 @@ const Signin = () => {
                 title: "Email should not be blank"
             });
         }
-        else if(!validateEmail(email))
-        {
+        else if (!validateEmail(email)) {
             setErrorNotification({
                 title: "Enter valid email"
             });
@@ -68,78 +67,41 @@ const Signin = () => {
         e.preventDefault();
         setLoading(true);
         if (password.length == 0) {
-           
-            setTimeout(()=>{
-                setLoading(false);
-                setErrorNotification({
-                    title: "Password should not be blank"
-                });
-            },400)
-           
+            setErrorNotification({
+                title: "Password should not be blank"
+            });
         }
         else {
             setErrorNotification({
             })
             const fetchData = async () => {
-                const data = {
-                    email: email,
-                    password: password,
-                }
-               const response = await authContext.signin(data,false)
-               if(response !== undefined){
-                // setError(`${response}`)
-                // setOpen(true);
-                }
-                // const response = await fetch(`${BaseURL}/login`, {
-                //     method: 'POST',
-                //     body: JSON.stringify(data),
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //     },
-                // })
-                if (true) {
-                    setAskForPassword(true);
+                try {
+                    const data = {
+                        email: email,
+                        password: password,
+                    }
+                    const response = await authContext.signin(data, false)
+                    if(response?.mfaEnabled){
+                        setMultiFactorAuthEnable(true);      
+                    }
+                    if (response?.error) {
+                        
+                        setServerErrorNotification({
+                            title: "Wrong email or password"
+                        })
+                       
+                        setAskForPassword(true)
+                    }
                     setLoading(false);
-                    setServerErrorNotification({
-                        title: "Wrong email or password"
-                    })
-                    setMultiFactorAuthEnable(true);
                 }
-                else {
-                    setMultiFactorAuthEnable(true);
+                catch (e) {
+                    console.log("error");
+                    setLoading(false);
                 }
-
-                // setTimeout(() => {
-                //     setLoading(false);
-                //     // setActiveStep(2)
-                // }, 2000);
-
-                // setMultiFactorAuthEnable(true);
-                // setErrorNotification({
-                //             title: "Enter Valid Verification code.Try again"
-                //        });
-
-                // if(true){
-                //     setErrorNotification({
-                //         title: "Enter Valid Verification code.Try again"
-                //     });
-                //     setIsError(true)
-                //     setIsVerifyEmailError(true);
-                //     setActiveStep(1);
-
-                // }
-                // else {
-                //     setActiveStep(1);
-                //     setIsAccountInfoUpdated(true);
-                // }
-                // setActiveStep(3);
-                // return response
             }
             fetchData();
         }
-        // setActiveStep(3);
-
-
+        
     }
 
     return (
@@ -166,9 +128,9 @@ const Signin = () => {
                                                 <div className="error-notification-box-inactive"></div>
                                             )
                                         }
-                                        <p className="register-text body-01">Don't have an account? <Link className="underlined-link" onClick={()=>{navigate("/signup")}}>Create an IBMid</Link></p>
+                                        <p className="register-text body-01">Don't have an account? <Link style={{cursor:'pointer'} } className="underlined-link" onClick={() => { navigate("/signup") }}>Create an IBMid</Link></p>
                                         <div className='login-input-wrapper' >
-                                            <FormLabel className='input-label' >IBMid <Link className="forgot-link" onClick={()=>{navigate("/forgotpassword")}}>Forgot ID?</Link></FormLabel>
+                                            <FormLabel className='input-label' >IBMid <Link style={{cursor:'pointer'} } className="forgot-link" onClick={() => { navigate("/forgotpassword") }}>Forgot ID?</Link></FormLabel>
                                             <TextInput
                                                 ref={emailInput}
                                                 id="email"
@@ -209,7 +171,7 @@ const Signin = () => {
                                             <Heading>Login In</Heading>
                                             <p className="register-text body-01">Logging in as {email}&nbsp; <Link className="underlined-link" style={{ cursor: 'pointer' }} onClick={() => { setAskForPassword(true) }}> Not you?</Link></p>
                                             <div className='login-input-wrapper' >
-                                                <FormLabel className='input-label' >Password <Link className="forgot-link" onClick={()=>{navigate("/forgotpassword")}}>Forgot Password?</Link></FormLabel>
+                                                <FormLabel className='input-label' >Password <Link style={{cursor:'pointer'} } className="forgot-link" onClick={() => { navigate("/forgotpassword") }}>Forgot Password?</Link></FormLabel>
                                                 <PasswordInput
                                                     type="password"
                                                     className="login-form-input"
