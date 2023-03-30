@@ -1,9 +1,9 @@
 
-.adduser-box{
+.edituser-box{
     display: flex;
     justify-content: center;
     overflow: auto;
-.adduser{
+.edituser{
     display: flex;
     /* justify-content: center; */
     align-items: center;
@@ -11,8 +11,13 @@
     background-color: white;
     overflow:auto;
     width: 600px;
-    margin: 16px;
     margin-bottom: 28px;
+    margin-top: 7%;
+    /* margin-bottom: 7%; */
+    height: calc(100vh - 109px);
+    overflow: scroll;
+    padding-bottom: 16px;
+    padding-top: 4px;
 
     .bx--text-input{
         display: flex;
@@ -21,10 +26,6 @@
         flex-direction: column;
         align-items: flex-start;
         border: 1px solid gray !important;
-        width: 266px;
-    }
-
-    .bx--text-input__field-outer-wrapper {
         width: 266px;
     }
     .country-select-dropdown{
