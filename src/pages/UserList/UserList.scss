@@ -1,3 +1,18 @@
 .bx--batch-summary__cancel {
     border:1px solid red;
 }
+.loader-page{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.button{
+    background-color: #0F6EF2;
+    border: none;
+    color: #fff;
+    margin: 4px 2px;
+    border-radius: 4px;
+    width: 100px;
+
+}

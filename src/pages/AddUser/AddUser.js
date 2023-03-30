@@ -34,15 +34,15 @@ export const AddUser = () => {
     if (isExpired) {
         console.log("", decodedToken)
     }
-    console.log("tt", decodedToken,isExpired);
+    console.log("tt", decodedToken, isExpired);
     const handleUserInfo = () => {
 
         const fetchData = async () => {
             try {
                 // setLoadingSuccess(true);
-                
 
-                debugger;
+
+                
                 const data = {
                     id: 0,
                     username: userName,
@@ -62,6 +62,26 @@ export const AddUser = () => {
                     cognito_user_groups: "",
                 }
 
+                const data3={
+                    accountIDs:[51]
+                }
+
+                const data1 = {
+                    username: "s@yopmail.com",
+                    fullName: "User",
+                    country: "India",
+                    addressLine: "noida",
+                    addressLine2: "",
+                    city: "a",
+                    postalCode: 85566,
+                    state: "a",
+                    phoneNumber: "8299785234",
+                    organisationId: 26,
+                    organisationAccount: 0
+                }
+
+                
+
                 // var isExpired = false;
                 // const jwt = require('jsonwebtoken');
                 // var decodedToken = jwt.decode(token, { complete: true });
@@ -70,22 +90,48 @@ export const AddUser = () => {
                 // if (decodedToken.exp < dateNow.getTime())
                 //     isExpired = true;
                 // debugger;
-                // const response = await fetch(`${BaseURL}/user`, {
-                //     method: 'POST',
-                //     body: JSON.stringify(data),
+                const response = await fetch(`${BaseURL}/user`, {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' +token
+                    },
+                })
+
+                //  const response = await fetch(`https://lc7p1jn3j0.execute-api.eu-central-1.amazonaws.com/Stage/user`, {
+                //     method:'PUT',
+                //     body: JSON.stringify(data1),
                 //     headers: {
                 //         'Content-Type': 'application/json',
                 //         'Authorization': 'Bearer ' +token
                 //     },
                 // })
 
-                const response = await fetch(`${BaseURL}/list-users`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token
-                    },
-                })
+                // const response = await fetch(`${BaseURL}/user`, {
+                //     method: 'DELETE',
+                //     body: JSON.stringify(data3),
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //         'Authorization': 'Bearer ' +token
+                //     },
+                // })
+
+                // const response = await fetch(`${BaseURL}/list-users`, {
+                //     method: 'GET',
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //         'Authorization': 'Bearer ' + token
+                //     },
+                // })
+
+                // const response = await fetch(`${BaseURL}/user`, {
+                //     method: 'GET',
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //         'Authorization': 'Bearer ' + token
+                //     },
+                // })
 
                 if (response.ok) {
                     // setMessage("account created ... moving to signin page")

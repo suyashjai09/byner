@@ -26,198 +26,248 @@ import {
 import {
     Link
 } from 'carbon-components-react';
-import { useState } from 'react';
-
+import { useEffect, useState, useContext } from 'react';
+import { BaseURL } from '../../sdk/constant';
+import { useJwt } from "react-jwt";
+import { AuthContext } from '../../sdk/context/AuthContext';
+import Loading from '@carbon/react/lib/components/Loading';
+import { Loader } from '../../Components/Loader/Loader';
+import { DataLoader } from '../../Components/Loader/DataLoder';
+import jwt_decode from "jwt-decode";
+import { useNavigate } from 'react-router-dom';
+import './UserList.scss'
+const token = localStorage.getItem('token');
+// const token="eyJraWQiOiJ3SGw5Yzg5cDhnQW80MlVSdVBYZW9CT1wvcVk5Y3ZobGNTWXBxbUlpXC9JQ2s9IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJlNWIwN2EwYi04YzAwLTQwZDktYjZlMC01ZjNiMDM3M2U1YzciLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAuZXUtY2VudHJhbC0xLmFtYXpvbmF3cy5jb21cL2V1LWNlbnRyYWwtMV9JV2JoN0JMcnoiLCJjbGllbnRfaWQiOiIxYm1wNjZiMjM1MnMzYzBic";
 export const UserList = () => {
 
+    const navigate = useNavigate();
     const [isDelete, setIsDelete] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const authContext = useContext(AuthContext)
+    const { decodedToken, isExpired } = useJwt(token);
+    const [rows, setRow] = useState([]);
+
+    // console.log(jwt_decode(token),"token")
+
+    // const parseJwt = async(token) => {        
+    //     const decode = JSON.parse(atob(token));
+    //     console.log(decode);
+    //     if (decode.exp * 1000 < new Date().getTime()) {
+    //         await authContext.signout();
+    //         console.log('Time Expired');
+    //         return;
+    //     }
+    // };
+
+    const getUserList = async () => {
+        try {
+            setLoading(true);
+            const response = await fetch(`${BaseURL}/list-users`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+            })
+            const res = await response.json();
+            if (response.ok) {
+
+                const result = res?.result.map((value, index) => ({
+                    ...value,
+                    id: index,
+                }));
+                setRow(result);
+            }
+            else if (response.status === 500) {
+
+            }
+            setLoading(false);
+
+
+        }
+        catch (e) {
+            setLoading(false);
+
+        }
+    }
+
+    useEffect(async() => {
+        // if (isExpired) {
+        //     await authContext.signout();
+        //     return;
+        // }
+        // parseJwt();
+        getUserList();
+    }, [])
+
     const headers = [
         {
-            header: 'Name',
-            key: 'name'
+            header: 'Username',
+            key: 'username'
         },
         {
-            header: 'Protocol',
-            key: 'protocol'
+            header: 'Fullname',
+            key: 'fullName'
         },
         {
-            header: 'Port',
-            key: 'port'
+            header: 'Country',
+            key: 'country'
         },
         {
-            header: 'Rule',
-            key: 'rule'
+            header: 'City',
+            key: 'city'
         },
         {
-            header: 'Attached groups',
-            key: 'attached_groups'
+            header: 'PostalCode',
+            key: 'postalCode'
         },
         {
-            header: 'Status',
-            key: 'status'
-        }
-    ];
-    const rows = [
-        {
-            attached_groups: 'Kevin’s VM Groups',
-            id: 'a',
-            name: 'Load Balancer 3',
-            port: 3000,
-            protocol: 'HTTP',
-            rule: 'Round robin',
-            status: <Link disabled>Disabled</Link>
+            header: 'State',
+            key: 'state'
         },
         {
-            attached_groups: 'Maureen’s VM Groups',
-            id: 'b',
-            name: 'Load Balancer 1',
-            port: 443,
-            protocol: 'HTTP',
-            rule: 'Round robin',
-            status: <Link>Starting</Link>
-        },
-        {
-            attached_groups: 'Andrew’s VM Groups',
-            id: 'c',
-            name: 'Load Balancer 2',
-            port: 80,
-            protocol: 'HTTP',
-            rule: 'DNS delegation',
-            status: <Link>Active</Link>
-        },
-        {
-            attached_groups: 'Marc’s VM Groups',
-            id: 'd',
-            name: 'Load Balancer 6',
-            port: 3000,
-            protocol: 'HTTP',
-            rule: 'Round robin',
-            status: <Link disabled>Disabled</Link>
-        },
-        {
-            attached_groups: 'Mel’s VM Groups',
-            id: 'e',
-            name: 'Load Balancer 4',
-            port: 443,
-            protocol: 'HTTP',
-            rule: 'Round robin',
-            status: <Link>Starting</Link>
-        },
-        {
-            attached_groups: 'Ronja’s VM Groups',
-            id: 'f',
-            name: 'Load Balancer 5',
-            port: 80,
-            protocol: 'HTTP',
-            rule: 'DNS delegation',
-            status: <Link>Active</Link>
+            header: 'Phonenumber',
+            key: 'phoneNumber'
         }
     ];
 
+    const deleteUser = async (filteredOrganisationId) => {
+        try {
+            if (isExpired) {
+                authContext.signout();
+                return;
+            }
+            setLoading(true);
+            const response = await fetch(`${BaseURL}/list-users`, {
+                method: 'DELETE',
+                body: JSON.stringify({ accountIDs: filteredOrganisationId }),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+            })
+            const res = await response.json();
+            if (response.ok) {
+
+                const result = res?.result.map((value, index) => ({
+                    ...value,
+                    id: index,
+                }));
+                setRow(result);
+            }
+            else if (response.status === 500) {
+
+            }
+            setLoading(false);
+
+
+        }
+        catch (e) {
+            setLoading(false);
+
+        }
+    }
+
+    const handleDelete = (selectedRows) => {
+        const tempArray = selectedRows.map(a => a.id);
+        let filteredOrganisationId = rows?.filter(person => tempArray.includes(person.id)).map(a => a.organisationID);
+        deleteUser(filteredOrganisationId);
+    }
+    
     return (
-        <div className='data-table'>
-            {/* <DataTable rows={rows} headers={headers}>
-            {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-                <Table {...getTableProps()}>
-                    <TableHead>
-                        <TableRow>
-                            {headers.map((header) => (
-                                <TableHeader {...getHeaderProps({ header })}>
-                                    {header.header}
-                                </TableHeader>
-                            ))}
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {rows.map((row) => (
-                            <TableRow {...getRowProps({ row })}>
-                                {row.cells.map((cell) => (
-                                    <TableCell key={cell.id}>{cell.value}</TableCell>
-                                ))}
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            )}
-        </DataTable> */}
-            <DataTable rows={rows} headers={headers}>
-                {({
-                    rows,
-                    headers,
-                    getHeaderProps,
-                    getRowProps,
-                    getSelectionProps,
-                    getBatchActionProps,
-                    onInputChange,
-                    selectedRows,
-                }) => (
-                    <TableContainer>
-                        <div>{console.log(getSelectionProps(),"test")}</div>
-                        <TableToolbar>
-                            <TableBatchActions {...getBatchActionProps()}>
-                                <TableBatchAction
-                                    tabIndex={getBatchActionProps().shouldShowBatchActions ? 0 : -1}
-                                    // renderIcon={TrashCan}
-                                    onClick={() => console.log(getSelectionProps(),selectedRows)}
-                                >
-                                    Delete
-                                </TableBatchAction>
-                                <TableBatchAction
-                                    tabIndex={getBatchActionProps().shouldShowBatchActions ? 0 : -1}
-                                    // renderIcon={Save}
-                                    onClick={() => console.log('clicked')}
-                                >
-                                    Save
-                                </TableBatchAction>
-                            </TableBatchActions>
-                            <TableToolbarContent>
-                                <TableToolbarSearch
-                                    tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
-                                    onChange={onInputChange}
-                                />
-                                <Button
-                                    tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
-                                    onClick={() => console.log('clicked')}
-                                    size="small"
-                                    kind="primary"
-                                >
-                                    Add new
-                                </Button>
-                                <Button
-                                    tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
-                                    onClick={() => setIsDelete(true)}
-                                    size="small"
-                                    kind="primary"
-                                >
-                                    Delete
-                                </Button>
-                            </TableToolbarContent>
-                        </TableToolbar>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    {isDelete && <TableSelectAll {...getSelectionProps()} />}
-                                    {headers.map((header) => (
-                                        <TableHeader {...getHeaderProps({ header })}>
-                                            {header.header}
-                                        </TableHeader>
-                                    ))}
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {rows.map((row) => (
-                                    <TableRow {...getRowProps({ row })}>
-                                        {isDelete && <TableSelectRow {...getSelectionProps({ row })} />}
-                                        {row.cells.map((cell) => (
-                                            <TableCell key={cell.id}>{cell.value}</TableCell>
-                                        ))}
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                )}
-            </DataTable>
-        </div>
+        <>
+            {loading ? (
+                <div className='loader-page'>
+                    <DataLoader />
+                </div>)
+                :
+                (
+                    <div className='data-table'>
+                        <DataTable rows={rows} headers={headers}>
+                            {({
+                                rows,
+                                headers,
+                                getHeaderProps,
+                                getRowProps,
+                                getSelectionProps,
+                                getBatchActionProps,
+                                onInputChange,
+                                selectedRows,
+                            }) => (
+                                <TableContainer>
+                                    <TableToolbar>
+                                        <TableBatchActions {...getBatchActionProps()}>
+                                            <TableBatchAction
+                                                tabIndex={getBatchActionProps().shouldShowBatchActions ? 0 : -1}
+                                                // renderIcon={TrashCan}
+                                                onClick={() => { handleDelete(selectedRows) }}
+                                            >
+                                                Delete
+                                            </TableBatchAction>
+                                            <TableBatchAction
+                                                tabIndex={getBatchActionProps().shouldShowBatchActions ? 0 : -1}
+                                                // renderIcon={Save}
+                                                onClick={() => { }}
+                                            >
+                                                Save
+                                            </TableBatchAction>
+                                        </TableBatchActions>
+                                        <TableToolbarContent>
+                                            <TableToolbarSearch
+                                                tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
+                                                onChange={onInputChange}
+                                            />
+                                            <Button
+                                                className="button"
+                                                tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
+                                                onClick={() => navigate('/adduser')}
+                                                size="sm"
+                                                kind="primary"
+                                            >
+                                                Add new user
+                                            </Button>
+                                            <Button
+                                                className="button"
+                                                tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
+                                                onClick={() => setIsDelete(!isDelete)}
+                                                size="sm"
+                                                kind="primary"
+                                            >
+                                                Delete user
+                                            </Button>
+                                        </TableToolbarContent>
+                                    </TableToolbar>
+                                    <Table>
+                                        <TableHead>
+                                            <TableRow>
+                                                {isDelete && <TableSelectAll {...getSelectionProps()} />}
+                                                {headers.map((header) => (
+                                                   
+                                                    <TableHeader  {...getHeaderProps({ header, isSortable: true })}>
+                                                        {header.header}
+                                                    </TableHeader>
+                                                ))}
+                                            </TableRow>
+                                        </TableHead>
+
+                                        <TableBody>
+                                            {rows.map((row) => (
+                                                <TableRow {...getRowProps({ row })}>
+                                                    {isDelete && <TableSelectRow {...getSelectionProps({ row })} />}
+                                                    {row.cells.map((cell, index) => (
+                                                        <TableCell key={cell.id}>{cell.value}</TableCell>
+
+                                                    ))}
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            )}
+                        </DataTable>
+                    </div>
+                )
+            }
+        </>
     )
 }
