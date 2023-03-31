@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }) => {
         navigate('/dashboard')
       }
     } else {
-      if (location.pathname === '/' || location.pathname === '/dashboard' || location.pathname === '/datatable' || location.pathname === '/tearsheet') {
+      if (location.pathname === '/' || location.pathname === '/dashboard' || location.pathname === '/datatable' || location.pathname === '/tearsheet' || location.pathname === '/adduser' || location.pathname === '/userlist') {
         navigate('/signin');
       }
 

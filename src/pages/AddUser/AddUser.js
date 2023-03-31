@@ -1,6 +1,6 @@
 
 import countrylist from "../../data/countrylist";
-import { useState, useRef } from "react";
+import { useState, useRef,useContext } from "react";
 import {
     PasswordInput, TextInput, Select,
     SelectItem
@@ -9,9 +9,14 @@ import 'react-telephone-input/css/default.css'
 import { BaseURL } from "../../sdk/constant";
 import PhoneInput from 'react-phone-input-2'
 import './AddUser.scss';
+import { useNavigate } from "react-router-dom";
+import { Loader } from "../../Components/Loader/Loader";
+import { AuthContext } from "../../sdk/context/AuthContext";
 
 export const AddUser = () => {
 
+    const navigate = useNavigate();
+    const authContext = useContext(AuthContext)
     const token = localStorage.getItem('token');
     const [country, setCountry] = useState("India");
     const [addressLine1, setAddressLine1] = useState('');
@@ -30,11 +35,9 @@ export const AddUser = () => {
     const [cityErrorNotification, setCityErrorNotification] = useState({});
     const [stateErrorNotification, setStateErrorNotification] = useState({});
     const [postalCodeErrorNotification, setPostalCodeErrorNotification] = useState({});
+    const [loading, setLoading] = useState(false);
     const emailInput = useRef(null);
     const fullNameInput = useRef(null);
-    const addressInput = useRef(null);
-    const cityNameInput = useRef(null);
-    const postalCodeInput = useRef(null);
     const passwordInput = useRef(null);
 
 
@@ -61,8 +64,6 @@ export const AddUser = () => {
         setFullName(e.target.value);
         if (e.target.value.length === 0) {
             setErrorNotification({ title: 'Full name should not be blank' });
-
-
         }
         else {
             setErrorNotification({});
@@ -81,7 +82,7 @@ export const AddUser = () => {
             const numberRegex = /[0-9]/;
             const specialcharacterRegex = /[-!$%^&*()_+|~=`{}\[\]:\/;<>?,.@#]/;
             if (e.target.value.trim().length >= 8 && uppercaseRegex.test(e.target.value) && lowercaseRegex.test(e.target.value) && numberRegex.test(e.target.value) && specialcharacterRegex.test(e.target.value)) {
-                return true;
+                setPasswordErrorNotification({})
             }
             else {
                 setPasswordErrorNotification({ title: 'Password should contain at least 8 character,one number,one lowercase,one uppercase' })
@@ -94,8 +95,6 @@ export const AddUser = () => {
         setAddressLine1(e.target.value);
         if (e.target.value.length === 0) {
             setAddressErrorNotification({ title: 'Address should not be blank' });
-
-
         }
         else {
             setAddressErrorNotification({});
@@ -106,8 +105,6 @@ export const AddUser = () => {
         setCity(e.target.value);
         if (e.target.value.length === 0) {
             setCityErrorNotification({ title: 'City should not be blank' });
-
-
         }
         else {
             setCityErrorNotification({});
@@ -118,8 +115,6 @@ export const AddUser = () => {
         setState(e.target.value);
         if (e.target.value.length === 0) {
             setStateErrorNotification({ title: 'Full name should not be blank' });
-
-
         }
         else {
             setStateErrorNotification({});
@@ -127,32 +122,29 @@ export const AddUser = () => {
     }
 
     const handlePostalCode = (e) => {
-       setPostalCode(e.target.value);
-       if(!/^\d+$/.test(e.target.value)){
-        setPostalCodeErrorNotification({ title: 'Postal should be integer' });
-       }
-       else if (e.target.value.length === 0) {
-        setPostalCodeErrorNotification({ title: 'Postal code should not be blank' });
-       }
-       else if (e.target.value.length !=6) {
-        setPostalCodeErrorNotification({ title: 'Postal code should be of 6 digit' });
-       }
-       else{
-        setPostalCodeErrorNotification({ });
-       }
-
-       
+        setPostalCode(e.target.value);
+        if (!/^\d+$/.test(e.target.value)) {
+            setPostalCodeErrorNotification({ title: 'Postal code should be integer' });
+        }
+        else if (e.target.value.length === 0) {
+            setPostalCodeErrorNotification({ title: 'Postal code should not be blank' });
+        }
+        else if (e.target.value.length != 6) {
+            setPostalCodeErrorNotification({ title: 'Postal code should be of 6 digit' });
+        }
+        else {
+            setPostalCodeErrorNotification({});
+        }
     }
 
-
-
+    const addUserButtonDisabled = (Object.keys(postalCodeErrorNotification).length != 0 || Object.keys(stateErrorNotification).length != 0 || Object.keys(cityErrorNotification).length != 0 || Object.keys(addressErrorNotification).length != 0 || Object.keys(passwordErrorNotification).length != 0 || Object.keys(errorNotification).length != 0 || Object.keys(emailErrorNotification).length != 0 || userName.length === 0 || fullName.length === 0 || password.length === 0 || addressLine1.length === 0 || city.length === 0 || state.length === 0 || postalCode.length === 0);
     const handleUserInfo = () => {
 
-        if (false) {
+        if (true) {
 
             const fetchData = async () => {
+                setLoading(true);
                 try {
-                    // setLoadingSuccess(true);
                     const data = {
                         id: 0,
                         username: userName,
@@ -172,27 +164,6 @@ export const AddUser = () => {
                         cognito_user_groups: "",
                     }
 
-                    const data3 = {
-                        accountIDs: [51]
-                    }
-
-                    const data1 = {
-                        username: "s@yopmail.com",
-                        fullName: "User",
-                        country: "India",
-                        addressLine: "noida",
-                        addressLine2: "",
-                        city: "a",
-                        postalCode: 85566,
-                        state: "a",
-                        phoneNumber: "8299785234",
-                        organisationId: 26,
-                        organisationAccount: 0
-                    }
-
-
-
-
                     const response = await fetch(`${BaseURL}/user`, {
                         method: 'POST',
                         body: JSON.stringify(data),
@@ -202,39 +173,18 @@ export const AddUser = () => {
                         },
                     })
 
-                    //  const response = await fetch(`https://lc7p1jn3j0.execute-api.eu-central-1.amazonaws.com/Stage/user`, {
-                    //     method:'PUT',
-                    //     body: JSON.stringify(data1),
-                    //     headers: {
-                    //         'Content-Type': 'application/json',
-                    //         'Authorization': 'Bearer ' +token
-                    //     },
-                    // })
-
-
-
-
                     if (response.ok) {
-                        // setMessage("account created ... moving to signin page")
-                        // setTimeout(() => {
-
-                        //     setLoadingSuccess(false);
-                        //     navigate('/signin');
-                        // }, [4000])
+                       navigate('/userlist');
                     }
                     else if (response.status === 500) {
-                        // setIsError(true)
-                        // // setIsVerifyEmailError(true);
-                        // // setActiveStep(1);
-                        // setErrorNotification({
-                        //     title: response.error
-                        // })
+                        navigate('/userlist');
                     }
-                    // setLoadingSuccess(false);
+                    setLoading(false);
 
                 }
                 catch (e) {
-                    // setLoadingSuccess(false);
+                    setLoading(false);
+                    await authContext.signout();
                 }
 
             }
@@ -259,7 +209,6 @@ export const AddUser = () => {
                     invalidText={(emailErrorNotification && emailErrorNotification.title) ? emailErrorNotification.title : ""}
                 />
                 <TextInput
-
                     ref={fullNameInput}
                     type="text"
                     id="fullname"
@@ -339,16 +288,25 @@ export const AddUser = () => {
                 <div>
                     <p>Phone number</p>
                 </div>
-                <PhoneInput className='phone-input'
-                    country={'us'}
+                <PhoneInput
+                    className='phone-input'
+                    country={'in'}
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e)}
                 />
-                <div >
-                    <button
-                        onClick={() => handleUserInfo()}>
-                        Next
-                    </button>
+                <div style={{ marginTop: '12px',marginBottom:'12px' }}>
+                    {loading ?
+                        (
+                            <div className="user-loader">
+                                <Loader/>
+                            </div>
+                        ) :
+                        (
+                            <button
+                                disabled={addUserButtonDisabled}
+                                className={addUserButtonDisabled ? 'submit-button-disabled' : 'submit-button'} onClick={() => handleUserInfo()} >
+                                Submit
+                            </button>)}
                 </div>
             </div>
         </div>

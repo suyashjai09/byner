@@ -1,8 +1,6 @@
 import React from "react";
-import { render } from "react-dom";
 import {
   SideNav,
-  SideNavDivider,
   SideNavItems,
   SideNavLink,
   SideNavMenu,
@@ -10,8 +8,7 @@ import {
 } from 'carbon-components-react';
 import { useNavigate } from "react-router-dom";
 import './Navbar.scss'
-import { Notification20, UserAvatar20, Switcher20,Search20,
-  AppSwitcher20 } from '@carbon/icons-react';
+import { Search20 } from '@carbon/icons-react';
 import { useTranslation } from "react-i18next";
 export const Navbar = ({isSideNavExpanded,onClickSideNavExpand}) => {
   let navigate = useNavigate();
@@ -36,7 +33,7 @@ export const Navbar = ({isSideNavExpanded,onClickSideNavExpand}) => {
             >
               <SideNavItems className="side-nav">
                 <SideNavLink renderIcon={Search20} className="side-nav-link" title="Data Table" onClick={()=>{navigate("/datatable")}}>{t('data-table')}</SideNavLink> 
-                <SideNavLink renderIcon={Search20} className="side-nav-link" title="User List" onClick={()=>{navigate("/userlist")}}>{t('data-table')}</SideNavLink> 
+                <SideNavLink renderIcon={Search20} className="side-nav-link" title="User List" onClick={()=>{navigate("/userlist")}}>User List</SideNavLink> 
                 {/* <SideNavLink renderIcon={Fade16} title="Side Panel" onClick={()=>{navigate("/sidepanel")}}>Side Panel</SideNavLink> 
                 <SideNavLink renderIcon={Fade16} title="Tear Sheet" onClick={()=>{navigate("/tearsheet")}}>TearSheet</SideNavLink> */}
                  
@@ -50,56 +47,8 @@ export const Navbar = ({isSideNavExpanded,onClickSideNavExpand}) => {
                 </SideNavMenu>
               </SideNavItems>
             </SideNav>
-            {/* <SideNav
-                aria-label="Side navigation"
-                expanded={isSideNavExpanded}
-                isRail
-              >
-                <SideNavItems>
-                  <SideNavMenuItem aria-current="page"    >
-                    Dashboard
-                  </SideNavMenuItem>
-                  <SideNavDivider/>
-                  <SideNavMenu title="Settings">
-                    <SideNavMenuItem >
-                      Setting 1
-                    </SideNavMenuItem>
-                    <SideNavMenuItem >
-                      Setting 2
-                    </SideNavMenuItem>
-                    <SideNavMenuItem >
-                      Setting 3
-                    </SideNavMenuItem>
-                  </SideNavMenu>
-                </SideNavItems>
-              </SideNav> */}
         </div>
     )
 }
 
 
-/**
- * <SideNav
-                aria-label="Side navigation"
-                expanded={isSideNavExpanded}
-                isPersistent={false}
-              >
-                <SideNavItems>
-                  <SideNavMenuItem aria-current="page"    >
-                    Dashboard
-                  </SideNavMenuItem>
-                  <SideNavDivider/>
-                  <SideNavMenu title="Settings">
-                    <SideNavMenuItem >
-                      Setting 1
-                    </SideNavMenuItem>
-                    <SideNavMenuItem >
-                      Setting 2
-                    </SideNavMenuItem>
-                    <SideNavMenuItem >
-                      Setting 3
-                    </SideNavMenuItem>
-                  </SideNavMenu>
-                </SideNavItems>
-              </SideNav>
- */

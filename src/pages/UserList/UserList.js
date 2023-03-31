@@ -17,39 +17,28 @@ import {
     TableToolbarAction,
     TableSelectAll,
     TableSelectRow,
+    ToastNotification
 } from 'carbon-components-react';
 import {
-    Notification20, UserAvatar20, Switcher20, Search20,
-    AppSwitcher20, User, Edit20
+   Edit20
 } from '@carbon/icons-react';
 import {
     Form,
     Button,
     Heading,
 } from '@carbon/react';
-import {
-    Link
-} from 'carbon-components-react';
-import {
-    Checkbox,
-} from '@carbon/react';
-import { Search } from '@carbon/icons-react';
 import { useEffect, useState, useContext } from 'react';
 import { BaseURL } from '../../sdk/constant';
-import { useJwt } from "react-jwt";
 import { AuthContext } from '../../sdk/context/AuthContext';
-import Loading from '@carbon/react/lib/components/Loading';
-import { Loader } from '../../Components/Loader/Loader';
 import { DataLoader } from '../../Components/Loader/DataLoder';
-import jwt_decode from "jwt-decode";
 import { useNavigate } from 'react-router-dom';
 import './UserList.scss'
 import { EditUser } from '../EditUser/EditUser';
+// import { ToastNotification } from "@carbon/react";
 
 export const UserList = () => {
 
     const token = localStorage.getItem('token');
-    // const token = "eyJraWQiOiJ3SGw5Yzg5cDhnQW80MlVSdVBYZW9CT1wvcVk5Y3ZobGNTWXBxbUlpXC9JQ2s9IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJlNWIwN2EwYi04YzAwLTQwZDktYjZlMC01ZjNiMDM3M2U1YzciLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAuZXUtY2VudHJhbC0xLmFtYXpvbmF3cy5jb21cL2V1LWNlbnRyYWwtMV9JV2JoN0JMcnoiLCJjbGllbnRfaWQiOiIxYm1wNjZiMjM1MnMzYzBic2xsOGM1cWZkOSIsIm9yaWdpbl9qdGkiOiJmZWFlYjI5My01Yjg3LTRhMmEtODdlNy05NjY2NzM3YTM0YjAiLCJldmVudF9pZCI6IjQxNjAwODA4LWU2MTAtNDU1Yy1iZTlkLTVhZjM0Y2U0NGJiOSIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE2ODAxNTUxMjksImV4cCI6MTY4MDE1ODcyOSwiaWF0IjoxNjgwMTU1MTI5LCJqdGkiOiI2NjljNjk4NC00OTcxLTRlNTMtYjFkOC1iZTNlODJhNjFiNjQiLCJ1c2VybmFtZSI6ImU1YjA3YTBiLThjMDAtNDBkOS1iNmUwLTVmM2IwMzczZTVjNyJ9.BTN2sIzQ84oxaXTjDUlShiA1-Phy9iB-XbjqODJvJCic_iGTD2FyaIF1PnkzLUG5ugem-J7eWEuVoUqPKRpQRP4Ey6Y0ItR6qA6ed4F1XqoZWynQy62Nm-KOb-V5tQcXQ0Z3CST6axbhr5e730FxUgHyuQZEIyOUHA5kJ5UjRyR7RHk8pMsppo2DbSnDvrWdSHNmA7CqpTefPbqqQ4YLNNkul-3BIJuEiNJ9WK4fur3grO7ZMogsTd0sga22Jx4uwCTMCIdKBpaS0aWOPKl3cunGDSXP0cluqdFfkDRa5fdvkBNI6_YJCMDiTgv0lSpQhYKvfG5UXOsYbEmj42-4Fg";
     const navigate = useNavigate();
     const [isDelete, setIsDelete] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
@@ -58,7 +47,8 @@ export const UserList = () => {
     const [rows, setRow] = useState([]);
     const [userDetails, setUserDetails] = useState({});
     const [isUserDetailEdit, setIsEditUserDetail] = useState(false);
-
+    const [serverErrorNotification,setServerErrorNotification] =useState({}) 
+    const [serverNotification,setServerNotification] =useState(false);
     const getUserList = async () => {
         try {
             setLoading(true);
@@ -73,25 +63,59 @@ export const UserList = () => {
 
             if (response.ok) {
                 const res = await response.json();
-                const result = res?.result.map((value, index) => ({
-                    ...value,
-                    id: index,
-                }));
-                setRow(result);
+                setRow(res?.result);
+            }
+            else if(response.status === 500){
+
             }
             setLoading(false);
         }
         catch (e) {
-            console.log(e.response,"error");
-            debugger;
-            // await authContext.signout();
+            await authContext.signout();
             setLoading(false);
         }
     }
 
+    const deleteUser = async (filteredOrganisationId) => {
+        try {
+            setLoading(true);
+            const response = await fetch(`${BaseURL}/user`, {
+                method: 'DELETE',
+                body: JSON.stringify({ accountIDs: filteredOrganisationId }),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+            })
+           
+            const res = await response.json();
+            if (response.ok) {
+             setServerNotification(true);
+             setServerErrorNotification({message:'User deleted sucessfully',status:'success'})
+            }
+            else if (response.status === 500) {
+                setServerNotification(true);
+                setServerErrorNotification({message:'Error deleting user',status:'error'})
+            }
+            getUserList();
+            // setLoading(false);
+        }
+        catch (e) {
+            setLoading(false);
+            // await authContext.signout();
+
+        }
+    }
+
+
     useEffect(async () => {
         getUserList();
     }, [])
+
+    useEffect(async () => {
+        if(serverNotification)
+        getUserList();
+    }, [serverNotification])
 
     const headers = [
         {
@@ -126,63 +150,18 @@ export const UserList = () => {
 
     const handleUserEdit = (index) => {
 
-        const userEdit = {
-            username: rows[index]?.username,
-            fullName: rows[index]?.fullName,
-            country: rows[index]?.country,
-            addressLine: rows[index]?.addressLine,
-            addressLine2: rows[index]?.addressLine2,
-            city: rows[index]?.city,
-            postalCode: rows[index]?.postalCode,
-            state: rows[index]?.state,
-            phoneNumber: rows[index]?.phoneNumber,
-            organisationId: rows[index]?.organisationID,
-            organisationAccount: rows[index]?.organisationAccount
-        }
-        setUserDetails(userEdit);
-        setIsEditUserDetail(true);
-        console.log(index,userEdit);
-    }
-
-    const deleteUser = async (filteredOrganisationId) => {
-        try {
-            setLoading(true);
-            const response = await fetch(`${BaseURL}/list-users`, {
-                method: 'DELETE',
-                body: JSON.stringify({ accountIDs: filteredOrganisationId }),
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
-                },
-            })
-            const res = await response.json();
-            if (response.ok) {
-
-                const result = res?.result.map((value, index) => ({
-                    ...value,
-                    id: index,
-                }));
-                setRow(result);
-            }
-            else if (response.status === 500) {
-
-            }
-            setLoading(false);
-        }
-        catch (e) {
-            console.log(e,"error");
-            setLoading(false);
-            await authContext.signout();
-
-        }
+        const userEditArray=rows?.filter(a => a.id === index);
+        console.log(userEditArray[0]);
+        setUserDetails(userEditArray[0]);
+        setServerNotification(false);
+         setIsEditUserDetail(true);
     }
 
     const handleDelete = (selectedRows) => {
         const tempArray = selectedRows.map(a => a.id);
-        let filteredOrganisationId = rows?.filter(person => tempArray.includes(person.id)).map(a => a.organisationID);
+        let filteredOrganisationId = rows?.filter(person => tempArray.includes(person.id)).map(a => a.id);
         deleteUser(filteredOrganisationId);
     }
-
     return (
         <>
             {loading ? (
@@ -194,10 +173,27 @@ export const UserList = () => {
                     <>
                         {isUserDetailEdit ? (
                             <div>
-                                <EditUser userDetails={userDetails}/>
+                                <EditUser userDetails={userDetails} setIsEditUserDetail={setIsEditUserDetail} setServerNotification={setServerNotification} setServerErrorNotification={setServerErrorNotification}/>
                             </div>
                         ) : (
-                            <div className='data-table'>
+                            <>
+                            {serverNotification?(
+                                <div  className='notification-box'>
+                                <ToastNotification
+                                iconDescription="describes the close button"
+                                subtitle={serverErrorNotification?.message}
+                                timeout={0}
+                                title={""}
+                                kind={serverErrorNotification?.status}
+                              />
+                              </div>
+                            ):
+                            (
+                            <div className='notification-box'>
+
+                            </div>
+                            )}
+                            <div className='userdata-table'>
                                 <DataTable rows={rows} headers={headers}>
                                     {({
                                         rows,
@@ -214,17 +210,9 @@ export const UserList = () => {
                                                 <TableBatchActions {...getBatchActionProps()}>
                                                     <TableBatchAction
                                                         tabIndex={getBatchActionProps().shouldShowBatchActions ? 0 : -1}
-                                                        // renderIcon={TrashCan}
                                                         onClick={() => { handleDelete(selectedRows) }}
                                                     >
                                                         Delete
-                                                    </TableBatchAction>
-                                                    <TableBatchAction
-                                                        tabIndex={getBatchActionProps().shouldShowBatchActions ? 0 : -1}
-                                                        // renderIcon={Save}
-                                                        onClick={() => { }}
-                                                    >
-                                                        Save
                                                     </TableBatchAction>
                                                 </TableBatchActions>
                                                 <TableToolbarContent>
@@ -247,8 +235,9 @@ export const UserList = () => {
                                                         onClick={() => setIsDelete(!isDelete)}
                                                         size="sm"
                                                         kind="primary"
+                                                        disabled={rows?.length ===0 ? true: false}
                                                     >
-                                                        Delete user
+                                                       {isDelete ? "Cancel Delete" :"Delete User"} 
                                                     </Button>
                                                     <Button
                                                         className="button"
@@ -256,8 +245,9 @@ export const UserList = () => {
                                                         onClick={() => setIsEdit(!isEdit)}
                                                         size="sm"
                                                         kind="primary"
+                                                        disabled={rows?.length ===0 ? true: false}
                                                     >
-                                                        Edit user
+                                                         {isEdit ? "Cancel Edit" :"Edit User"} 
                                                     </Button>
                                                 </TableToolbarContent>
                                             </TableToolbar>
@@ -292,7 +282,10 @@ export const UserList = () => {
                                         </TableContainer>
                                     )}
                                 </DataTable>
-                            </div>)
+                            </div>
+                            </>
+                            )
+                            
                         }
                     </>
                 )

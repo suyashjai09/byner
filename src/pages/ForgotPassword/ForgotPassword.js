@@ -149,13 +149,21 @@ const ForgotPassword = () => {
                             'Content-Type': 'application/json',
                         },
                     })
+                    const res= await response.json();
                     if (response.ok) {
                         navigate("/signin");
                     }
                     else if (response.status === 500) {
+                        if(res.error === "error resetting passwordLimitExceededException: Attempt limit exceeded, please try after some time.")
                         setServerErrorNotification({
-                            title: "Enter valid verification code"
+                            title: "Maximum attemps to reset password failed,try after some time"
                         })
+                        else{
+                            setServerErrorNotification({
+                                title: "Enter valid verification code"
+                            })
+                        }
+                        setAskForPassword(true);
                     }
                     setLoading(false);
                 }
@@ -233,9 +241,9 @@ const ForgotPassword = () => {
                                                 id="email"
                                                 className="login-form-input"
                                                 hideLabel={false}
-                                                invalid={typeof errorNotification == 'object' && Object.keys(errorNotification).length !== 0 && verificationCode.length === 0}
+                                                invalid={typeof errorNotification == 'object' && Object.keys(errorNotification).length !== 0 }
                                                 labelText="Enter Verification Code"
-                                                invalidText={(errorNotification && errorNotification.title && verificationCode.length === 0) ? errorNotification.title : ""}
+                                                invalidText={(errorNotification && errorNotification.title ) ? errorNotification.title : ""}
                                                 placeholder=""
                                                 disabled={loading ? true : false}
                                                 value={verificationCode}

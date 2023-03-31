@@ -58,7 +58,7 @@ const Signup = () => {
     const [vatNumber, setVatNumber] = useState('');
     const [organizationName, setOrganizationName] = useState('');
     const [organizationCountry, setCountryName] = useState("India");
-    const [isGstValid, setGstValid] = useState(false);
+    const [isGstValid, setGstValid] = useState(true);
     const [cardNumber, setCardNumber] = useState('');
     const [cardExpiryDate, setCardExpiryDate] = useState('');
     const [cardCVV, setCardCVV] = useState('');
@@ -140,7 +140,6 @@ const Signup = () => {
         const specialcharacterRegex = /[-!$%^&*()_+|~=`{}\[\]:\/;<>?,.@#]/;
         const tempArray = [lengthRegex.test(value.trim()), uppercaseRegex.test(value), lowercaseRegex.test(value), numberRegex.test(value), specialcharacterRegex.test(value), value.length == value.trim().length];
         setPasswordArray(tempArray)
-        console.log(ref?.current?.offsetWidth)
         setpaswordStrengthWidth(tempArray.filter(i => i === true).length * ref?.current?.offsetWidth/6);
         setPasswordIsValid(lengthRegex.test(value.trim()) && uppercaseRegex.test(value) && lowercaseRegex.test(value) && numberRegex.test(value) && specialcharacterRegex.test(value))
     };
@@ -215,9 +214,7 @@ const Signup = () => {
                     setActiveStep(3);
                     setIsError(false)
                     setIsVerifyEmailError(false);
-                    // const res=JSON.parse(response);
                     setUserId(res?.accountID);
-                    console.log(res?.accountID,"id")
                 }
                 else if (response.status === 500) {
                     setIsError(true)
@@ -308,8 +305,8 @@ const Signup = () => {
 
     const handleVatNumberChange = (value) => {
         setVatNumber(value);
-        const gstRegex = /[0-9]{2}[A-Z]{3}[ABCFGHLJPTF]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}/;
-        setGstValid(gstRegex.test(value))
+        // const gstRegex = /[0-9]{2}[A-Z]{3}[ABCFGHLJPTF]{1}[A-Z]{1}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}/;
+        setGstValid(value.length >0);
       
     }
 
@@ -335,17 +332,14 @@ const Signup = () => {
     }
 
     const creditCardButtonDisabled = cardCVV.length == 0 || cardExpiryDate.length == 0 || cardNumber.length == 0;
-    const taxInfoButtonDisabled = organizationName.length == 0 || organizationCountry.length == 0 || (!isGstValid || vatNumber.length === 0);
-    // console.log(organizationName.length == 0, organizationCountry.length == 0, !isGstValid, vatNumber.length > 0, "tex valid");
+    const taxInfoButtonDisabled = organizationName.length == 0 || organizationCountry.length == 0 || ( vatNumber.length === 0);
     useEffect(() => {
         // 👇️ scroll to top on page load
-        // console.log(errorNotification, 'check', isError)
         if (isError) {
             document.getElementById("scroller").scroll(0, 0);
         }
     }, [isError]);
 
-    // console.log(accountInfoButtonDisabled, verificationEmailButtonDisabled, personalInfoButtonDisabled, taxInfoButtonDisabled, creditCardButtonDisabled, 'ischeck', !isChecked, 'crete')
     return (
 
         <div id="scroller" style={{ overflow: 'auto', backgroundColor: '#000' }}>
@@ -516,7 +510,7 @@ const Signup = () => {
                             <p>Phone number</p>
                         </div>
                         <PhoneInput className='phone-input'
-                            country={'us'}
+                            country={'in'}
                             value={phoneNumber}
                             onChange={(e) => setPhoneNumber(e)}
                         />
@@ -552,24 +546,24 @@ const Signup = () => {
                             <p className='text-heading'>Tax information</p>
                         </div>
                         <TextInput type="text"
-                            labelText="Organization name"
+                            labelText="Organization Name"
                             value={organizationName}
                             onChange={(e) => setOrganizationName(e.target.value)}
                         />
                         <TextInput type="text"
-                            labelText="Vat number"
+                            labelText="Vat Number"
                             value={vatNumber}
                             onChange={(e) => handleVatNumberChange(e.target.value)}
-                            invalid={!isGstValid && vatNumber.length > 0}
+                            invalid={!isGstValid && vatNumber.length === 0}
                             invalidText={
-                                !isGstValid && vatNumber.length > 0
-                                    ? 'Enter valid vat number' : null
+                                !isGstValid && vatNumber.length === 0
+                                    ? 'Vat number cannot be blank' : null
                             }
                         />
                         <Select className='country-select'
                             value={organizationCountry}
                             id='country-ci'
-                            labelText='organisation Country'
+                            labelText='Organisation Country'
                             onChange={e => setCountryName(e.target.value)}
                         >
                             {countrylist.map((countryObject, countryIndex) => (<SelectItem
@@ -591,7 +585,6 @@ const Signup = () => {
                             <p className='text-heading'>Tax information</p>
                             <button className='edit-button' onClick={() => handleEditClick("4")}>Edit</button>
                         </div>
-                        {/* <p className='text-heading-edit'>{firstName + " " + lastName}</p> */}
                         <p className='text-heading-edit'>{country}</p>
                         <p className='text-heading-edit'>{city}</p>
                     </div>) : (
