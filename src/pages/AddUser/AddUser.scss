@@ -1,4 +1,4 @@
-
+@import '../../carbon-settings.scss';
 .adduser-box{
     display: flex;
     justify-content: center;
@@ -8,7 +8,7 @@
     /* justify-content: center; */
     align-items: center;
     flex-direction: column;
-    background-color: white;
+    background-color: var(--cds-ui-navbar, #f4f4f4) !important;
     overflow:auto;
     width: 600px;
     margin: 16px;
