@@ -45,3 +45,12 @@
     margin-bottom: 0.5rem;
     margin: auto;
 }
+
+@media screen and (max-width:600px){
+    .userdata-table{
+        margin: 64px;
+        margin-top: 32px;
+        overflow-x: auto;
+        margin-right: 32px;
+    }
+}
