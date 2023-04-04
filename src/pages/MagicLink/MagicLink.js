@@ -1,28 +1,35 @@
-import React, { useState, useRef, useContext, useEffect } from 'react';
 import {
-    Form,
     Button,
-    Heading,
-    Checkbox,
+    Form,
     FormLabel,
-    Link,
-    InlineNotification,
+    Heading
 } from '@carbon/react';
+import { Auth } from 'aws-amplify';
 import {
-    PasswordInput, TextInput, ToastNotification
+    TextInput, ToastNotification
 } from 'carbon-components-react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import {
+    useLocation, useNavigate,
+    useSearchParams
+} from 'react-router-dom';
 import { Loader } from '../../Components/Loader/Loader';
 import { AuthContext } from '../../sdk/context/AuthContext';
-import { MagicLinkPopup } from './MagicLinkPopup';
-import { BaseURL } from '../../sdk/constant';
-import {
-    useLocation,useNavigate
-} from 'react-router-dom';
-import { useSearchParams } from "react-router-dom";
 import './MagicLink.scss';
+import { MagicLinkPopup } from './MagicLinkPopup';
+import { Amplify } from 'aws-amplify';
+import { CognitoUser } from '@aws-amplify/auth';
+
+Amplify.configure({
+    Auth: {
+        region: 'eu-central-1',
+        userPoolId: 'eu-central-1_IWbh7BLrz',
+        userPoolWebClientId: '1bmp66b2352s3c0bsll8c5qfd9',
+    }
+});
 export const MagicLink = () => {
 
-    const navigate=useNavigate();
+    const navigate = useNavigate();
     let [searchParams, setSearchParams] = useSearchParams();
     const authContext = useContext(AuthContext)
     const [error, setError] = useState("");
@@ -32,10 +39,10 @@ export const MagicLink = () => {
     const [errorNotification, setErrorNotification] = useState({});
     const [serverErrorNotification, setServerErrorNotification] = useState({});
     const [userEmail, setEmail] = useState("");
-    const [verificationCode, setVerificationCode] = useState("");
+    const [loginToken, setLoginToken] = useState("");
     const [serverNotification, setServerNotification] = useState(false);
-    const location = useLocation();
-    const { email, token } = useSearchParams();
+    const [verificationCode, setVerificationCode] = useState('');
+    const cognitoUser = useRef(null);
 
     const emailInput = useRef(null);
     const validateEmail = (userEmail) => {
@@ -46,7 +53,7 @@ export const MagicLink = () => {
             );
     };
 
-    const handleEmailFormSubmit = (e) => {
+    const handleEmailFormSubmit = async (e) => {
         e.preventDefault();
         if (userEmail.length == 0) {
             setErrorNotification({
@@ -62,141 +69,59 @@ export const MagicLink = () => {
             setErrorNotification({
             })
             setServerNotification(false);
-            const fetchData = async () => {
-
-                try {
-                    setLoading(true);
-                    const data = {
-                        email: userEmail
-                    }
-                    const response = await fetch(`${BaseURL}/magic-login`, {
-                        method: 'POST',
-                        body: JSON.stringify(data),
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    })
-
-                    if (response.ok) {
-                        // setIsMagicLink(false);
-                        setServerErrorNotification({
-                            title: "Link sent to registered mail",
-                            status: 'success'
-                        })
-                        setServerNotification(true);
-                    }
-                    else if (response.status === 500) {
-                        setServerErrorNotification({
-                            title: "Username not registered",
-                            status: 'error'
-                        })
-                        setServerNotification(true);
-                    }
-                    setLoading(false);
-                }
-                catch (e) {
-                    console.log("error");
-                    setLoading(false);
-                }
-            }
-            fetchData();
-
-        }
-
-    }
-
-    const validateMagicLink = (email, magicLinkToken) => {
-
-        const fetchData = async () => {
-
             try {
-                setLoading(true);
-                const data = {
-                    email: email,
-                    code: magicLinkToken,
-                }
+                cognitoUser.current = await Auth.signIn({
+                    username: userEmail,
+                });
 
-                // const response = await fetch(`${BaseURL}/verify-magic-link`, {
-                //     method: 'POST',
-                //     body: JSON.stringify(data),
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //     },
-                // })
-
-                const response={
-                    status:500,
-                    ok:false
-                }
-
-                if (response.ok) {
-                    localStorage.setItem("token", token);
-                    localStorage.setItem("theme", 'carbon-theme--white');
-                    localStorage.setItem("lang", "english");
-                    const bodyElement = document.body;
-                    bodyElement.className = localStorage.getItem("theme");
-                    navigate("/dashboard");
-                }
-                else if (response.status === 500) {
-                    setError('Magic link Expired ,please retry');
-                    setIsMagicLink(false);
-                }
-                setLoading(false);
+                setIsMagicLink(false);
             }
             catch (e) {
-                console.log("error");
-                setLoading(false);
+                setServerErrorNotification({ title: 'Email address not verified', status: 'error' });
+                setServerNotification(true);
+
             }
+
         }
-        fetchData();
 
     }
 
 
+    const verifyMagicLink = async (e) => {
+        e.preventDefault()
+        if (verificationCode.length == 0) {
+            setErrorNotification({
+                title: "Verification code should not be blank"
+            });
+        }
+        await Auth.sendCustomChallengeAnswer(cognitoUser.current, verificationCode);
+        try {
+            const res = await Auth.currentSession();
+            if (res.accessToken.jwtToken) {
+                localStorage.setItem("token", res.accessToken.jwtToken);
+                localStorage.setItem("theme", 'carbon-theme--white');
+                localStorage.setItem("lang", "english");
+                const bodyElement = document.body;
+                bodyElement.className = localStorage.getItem("theme");
+                navigate("/dashboard");
+            }
+        } catch {
+            console.log('Apparently the user did not enter the right code');
+            setServerErrorNotification({ title: 'Enter valid code', status: 'error' });
+            setServerNotification(true);
+            setIsMagicLink(true);
+        }
+    }
 
-    useEffect(() => {
+    useEffect(async () => {
         const tokenCheck = localStorage.getItem("token");
         if (tokenCheck !== null) {
             setUserSignIn(true);
-        } else {
-            // setUserSignIn(false);
-            // setIsMagicLink(false);
-            const email = searchParams.get('email');
-            const magicLinkToken = searchParams.get('token');
-            // console.log("ee", email, "ml", magicLinkToken,searchParams.get('token').length, "testoo")
-            if (email != null && magicLinkToken != null && magicLinkToken.length===0) {
-                
-                validateMagicLink(email, magicLinkToken);
-
-            }
-            else if (email == null || magicLinkToken == null || magicLinkToken.length===0) {
-                setIsMagicLink(false);
-                setError("Enter valid magic link")
-               
-            }
-            else if (email == null && magicLinkToken == null) {
-                setIsMagicLink(true);
-                
-               
-            }
-
 
         }
-    }, [location]);
 
-    // useEffect(() => {
-    //     const email =searchParams.get('email');
-    //     const magicLinkToken=searchParams.get('token');
-    //     console.log("ee",email,magicLinkToken,"testoo")
-    //     if(email!=null && magicLinkToken!=null){
+    }, []);
 
-    //     }
-    //     else{
-
-    //     }
-    // }, [location])
-
-    console.log(serverErrorNotification, serverNotification, "test")
     return (
         <>
             {userSignIn ? (
@@ -260,11 +185,42 @@ export const MagicLink = () => {
                                 </Form>
                             </div>
                         </div>) : (
-                            <div className='magiclink-send-container' >
+                            <div className='magiclink-container' >
                                 <div className='box-container'>
-                                    <div style={{ paddingRight: '20px' }}>
-                                        <p>{error}</p>
-                                    </div>
+                                    <Form onSubmit={verifyMagicLink}>
+                                        <div style={{ paddingRight: '20px' }}>
+                                            <div className='login-input-wrapper' >
+                                                <FormLabel className='input-label' >Enter Verification Code </FormLabel>
+                                                <TextInput
+                                                    id="email"
+                                                    className="login-form-input"
+                                                    hideLabel={false}
+                                                    invalid={typeof errorNotification == 'object' && Object.keys(errorNotification).length !== 0}
+                                                    labelText=""
+                                                    invalidText={(errorNotification && errorNotification.title) ? errorNotification.title : ""}
+                                                    placeholder=""
+                                                    disabled={loading ? true : false}
+                                                    value={verificationCode}
+                                                    onChange={e => { setVerificationCode(e.target.value); if (typeof errorNotification == 'object' && Object.keys(errorNotification).length !== 0) setErrorNotification({}); }}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className='fields-container'>
+                                            {loading ?
+                                                (<div className='loader-signin'>
+                                                    <Loader />
+                                                </div>) :
+                                                (<Button
+
+                                                    type="submit"
+                                                    iconDescription={""}
+                                                    size="xl"
+                                                    className="submit-button"
+                                                >{"Verify"}</Button>)}
+
+                                        </div>
+
+                                    </Form>
                                 </div>
                             </div>
                         )}
